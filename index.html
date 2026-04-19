@@ -515,14 +515,23 @@ function getDailyQuote() {
 // ================================================================
 // HELPERS
 // ================================================================
-function todayStr() { return new Date().toISOString().slice(0,10); }
+const DAY_BUFFER_HOUR = 4; // Before 4am, treat as previous day
+function toLocalDateStr(d) {
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function todayStr() {
+  const now=new Date();
+  if(now.getHours()<DAY_BUFFER_HOUR) { now.setDate(now.getDate()-1); }
+  return toLocalDateStr(now);
+}
 function fmtFull(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
 function fmtShort(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
 function getDow(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'}).toUpperCase(); }
 function getDay(ds) { return new Date(ds+'T00:00:00').getDate(); }
 function getMonthKey(ds) { return ds.slice(0,7); }
 function monthLabel(mk) { const[y,m]=mk.split('-'); const ms=['January','February','March','April','May','June','July','August','September','October','November','December']; return ms[parseInt(m)-1]+' '+y; }
-function getGreeting() { const h=new Date().getHours(); if(h<12)return'Good morning'; if(h<18)return'Good afternoon'; return'Good evening'; }
+function getGreeting() { const h=new Date().getHours(); if(h<DAY_BUFFER_HOUR)return'Still up? 🌙'; if(h<12)return'Good morning'; if(h<18)return'Good afternoon'; return'Good evening'; }
 function getMoodClass(v) { if(!v)return''; const l=v.toLowerCase(); if(l.includes('great')||l.includes('very good')||l.includes('很好'))return'mood-great'; if(l.includes('ok')||l.includes('还行')||l.includes('还不错'))return'mood-ok'; if(l.includes('low')||l.includes('不太好')||l.includes('一般'))return'mood-low'; if(l.includes('bad')||l.includes('很差'))return'mood-bad'; return'mood-ok'; }
 function getMoodLabel(v) { return v?(v.split(' / ')[0]||v):''; }
 function getGroupIcon(g) { return g==='work'?'&#128188;':'&#127793;'; }
@@ -567,13 +576,13 @@ function renderHome() {
   const mr=routines.filter(r=>r.type==='morning'&&r.active), er=routines.filter(r=>r.type==='evening'&&r.active);
   const md=mr.filter(r=>isRoutineDone(r.id,today)).length, ed=er.filter(r=>isRoutineDone(r.id,today)).length;
   const mp=mr.length?Math.round(md/mr.length*100):0, ep=er.length?Math.round(ed/er.length*100):0;
-  const questions=getQuestions(), moodQ=questions.find(q=>q.label==='心情'), diaryQ=questions.find(q=>q.label==='一行日记');
+  const questions=getQuestions(), moodQ=questions.find(q=>q.label==='心情');
   const sortedDates=Object.keys(records).sort().reverse().slice(0,5);
   function ring(p,c) { const ci=2*Math.PI*20,o=ci-(ci*p/100); return`<svg width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#E8E6E1" stroke-width="4"/><circle cx="25" cy="25" r="20" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${ci}" stroke-dashoffset="${o}" stroke-linecap="round"/></svg>`; }
-  const weekDates=[]; for(let i=6;i>=0;i--){ const d=new Date();d.setDate(d.getDate()-i);weekDates.push(d.toISOString().slice(0,10)); }
-  const sleepQ=questions.find(q=>q.label==='睡眠'), exerciseQ=questions.find(q=>q.label==='运动');
-  let sT=0,sC=0,eD=0;
-  weekDates.forEach(d=>{const rec=records[d];if(rec&&sleepQ&&rec.responses?.[sleepQ.id]){sT+=parseFloat(rec.responses[sleepQ.id])||0;sC++;}if(rec&&exerciseQ&&rec.responses?.[exerciseQ.id])eD++;});
+  const weekDates=[]; for(let i=6;i>=0;i--){ const d=new Date();d.setDate(d.getDate()-i);weekDates.push(toLocalDateStr(d)); }
+  const exerciseQ=questions.find(q=>q.label==='运动');
+  let eD=0;
+  weekDates.forEach(d=>{const rec=records[d];if(rec&&exerciseQ&&rec.responses?.[exerciseQ.id])eD++;});
   const hasToday=!!records[today];
 
   document.getElementById('view-home').innerHTML=`
@@ -606,11 +615,10 @@ function renderHome() {
     <div class="section-label">This Week</div>
     <div class="quick-stats">
       <div class="stat-item"><div class="stat-icon">&#128170;</div><div class="stat-value">${eD}/7</div><div class="stat-label">Exercise</div></div>
-      <div class="stat-item"><div class="stat-icon">&#128164;</div><div class="stat-value">${sC?(sT/sC).toFixed(1)+'h':'--'}</div><div class="stat-label">Avg Sleep</div></div>
       <div class="stat-item"><div class="stat-icon">&#128197;</div><div class="stat-value">${Object.keys(records).filter(d=>weekDates.includes(d)).length}/7</div><div class="stat-label">Recorded</div></div>
     </div>
     <div class="section-label">Recent Entries</div>
-    ${sortedDates.length?`<div class="card">${sortedDates.map(d=>{const rec=records[d];const mood=moodQ&&rec.responses?.[moodQ.id]?rec.responses[moodQ.id]:'';const diary=diaryQ&&rec.responses?.[diaryQ.id]?rec.responses[diaryQ.id]:'';return`<div class="recent-entry" onclick="openCreateEdit('${d}')"><div class="day-badge"><span class="dow">${getDow(d)}</span>${getDay(d)}</div><div class="entry-info"><div class="entry-mood"><span class="mood-dot ${getMoodClass(mood)}"></span>${getMoodLabel(mood)||'No mood'}</div><div class="entry-diary">${diary||'No diary entry'}</div></div><div class="entry-arrow">&#8250;</div></div>`;}).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">&#128221;</div><p>No records yet. Start recording!</p></div>`}`;
+    ${sortedDates.length?`<div class="card">${sortedDates.map(d=>{const rec=records[d];const mood=moodQ&&rec.responses?.[moodQ.id]?rec.responses[moodQ.id]:'';const goodQ=questions.find(q=>q.label==='今天发生的好事');const goodThing=goodQ&&rec.responses?.[goodQ.id]?rec.responses[goodQ.id]:'';return`<div class="recent-entry" onclick="openCreateEdit('${d}')"><div class="day-badge"><span class="dow">${getDow(d)}</span>${getDay(d)}</div><div class="entry-info"><div class="entry-mood"><span class="mood-dot ${getMoodClass(mood)}"></span>${getMoodLabel(mood)||'No mood'}</div><div class="entry-diary">${goodThing||'No entry yet'}</div></div><div class="entry-arrow">&#8250;</div></div>`;}).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">&#128221;</div><p>No records yet. Start recording!</p></div>`}`;
 }
 
 // ================================================================
@@ -642,7 +650,7 @@ function renderRecStep() {
   let inputHtml='';
   if(q.type==='text') inputHtml=`<textarea class="text-input" rows="4" id="rec-input" placeholder="Write here...">${cv}</textarea>`;
   else if(q.type==='number') inputHtml=`<input type="number" class="text-input" id="rec-input" placeholder="e.g. 7.5" value="${cv}" style="font-size:28px;text-align:center;max-width:200px;margin:0 auto;display:block" step="0.5">`;
-  else if(q.type==='time') inputHtml=`<input type="time" class="text-input" id="rec-input" value="${cv}" style="font-size:28px;text-align:center;max-width:200px;margin:0 auto;display:block">`;
+  else if(q.type==='time') { const timeVal=cv||new Date().toTimeString().slice(0,5); inputHtml=`<input type="time" class="text-input" id="rec-input" value="${timeVal}" style="font-size:28px;text-align:center;max-width:200px;margin:0 auto;display:block">`; }
   else if(q.type==='choice') inputHtml=`<div class="choice-grid">${q.options.map(o=>`<div class="choice-option ${cv===o?'selected':''}" onclick="selRecChoice(this,'${esc(o)}')"><div class="choice-dot"></div><span>${o}</span></div>`).join('')}</div>`;
   else if(q.type==='rating') { const cr=parseInt(cv)||0; inputHtml=`<div class="rating-row">${[1,2,3,4,5].map(n=>`<div class="rating-star ${n<=cr?'filled':''}" onclick="selRecRating(${n})">${n}</div>`).join('')}</div><div style="display:flex;justify-content:space-between;color:var(--text-light);font-size:11px;padding:0 4px"><span>Low</span><span>High</span></div>`; }
   const isLast=recStep===total-1;
@@ -733,7 +741,7 @@ function renderEditableField(q, val, date) {
   let inputHtml='';
   if(q.type==='text') inputHtml=`<div class="inline-input"><textarea class="text-input" id="${fid}" rows="2" placeholder="Write here...">${val}</textarea></div>`;
   else if(q.type==='number') inputHtml=`<div class="inline-input"><input type="number" class="text-input" id="${fid}" value="${val}" placeholder="e.g. 7.5" step="0.5"></div>`;
-  else if(q.type==='time') inputHtml=`<div class="inline-input"><input type="time" class="text-input" id="${fid}" value="${val}"></div>`;
+  else if(q.type==='time') { const tv=val||new Date().toTimeString().slice(0,5); inputHtml=`<div class="inline-input"><input type="time" class="text-input" id="${fid}" value="${tv}"></div>`; }
   else if(q.type==='choice') inputHtml=`<div class="inline-choice" id="${fid}">${q.options.map(o=>`<span class="inline-choice-opt ${val===o?'selected':''}" onclick="this.parentElement.querySelectorAll('.inline-choice-opt').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')">${o}</span>`).join('')}</div>`;
   else if(q.type==='rating') { const cr=parseInt(val)||0; inputHtml=`<div class="inline-rating" id="${fid}">${[1,2,3,4,5].map(n=>`<div class="r-btn ${n<=cr?'filled':''}" onclick="this.parentElement.querySelectorAll('.r-btn').forEach((s,i)=>{if(i<${n})s.classList.add('filled');else s.classList.remove('filled')})">${n}</div>`).join('')}</div>`; }
   return `<div class="field-card"><div class="field-label">${getCatIcon(q.category)} ${q.labelEn} · ${q.label}</div>${inputHtml}</div>`;
@@ -768,7 +776,7 @@ function editField(date,qId) {
   let inputHtml='';
   if(q.type==='text') inputHtml=`<textarea class="text-input" rows="3" id="edit-input">${cv}</textarea>`;
   else if(q.type==='number') inputHtml=`<input type="number" class="text-input" id="edit-input" value="${cv}" step="0.5">`;
-  else if(q.type==='time') inputHtml=`<input type="time" class="text-input" id="edit-input" value="${cv}">`;
+  else if(q.type==='time') { const tv=cv||new Date().toTimeString().slice(0,5); inputHtml=`<input type="time" class="text-input" id="edit-input" value="${tv}">`; }
   else if(q.type==='choice') inputHtml=`<div class="choice-grid" id="edit-choices">${q.options.map(o=>`<div class="choice-option ${cv===o?'selected':''}" onclick="this.parentElement.querySelectorAll('.choice-option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected')"><div class="choice-dot"></div><span>${o}</span></div>`).join('')}</div>`;
   else if(q.type==='rating') { const cr=parseInt(cv)||0; inputHtml=`<div class="rating-row" id="edit-rating">${[1,2,3,4,5].map(n=>`<div class="rating-star ${n<=cr?'filled':''}" onclick="this.parentElement.querySelectorAll('.rating-star').forEach((s,i)=>{if(i<${n})s.classList.add('filled');else s.classList.remove('filled')})">${n}</div>`).join('')}</div>`; }
   const sheet=document.getElementById('edit-sheet');
@@ -872,7 +880,7 @@ function renderMonthly() {
       <button class="add-btn" style="padding:10px 20px;background:var(--accent)" onclick="updateToNotes()">&#128221; Update to Notes</button>
     </div>`;
 }
-function changeMonth(dir) { const[y,m]=currentMonth.split('-').map(Number);const d=new Date(y,m-1+dir,1);currentMonth=d.toISOString().slice(0,7);renderMonthly(); }
+function changeMonth(dir) { const[y,m]=currentMonth.split('-').map(Number);const d=new Date(y,m-1+dir,1);currentMonth=toLocalDateStr(d).slice(0,7);renderMonthly(); }
 function exportMonthCSV() {
   const records=getRecords(),questions=getQuestions().sort((a,b)=>a.order-b.order);
   const mds=Object.keys(records).filter(d=>getMonthKey(d)===currentMonth).sort();
@@ -1139,6 +1147,13 @@ function exportData() {
 
 // INIT
 renderHome();
+// Auto-refresh: update home page every 60s so time/greeting stay current
+setInterval(()=>{ if(currentView==='home') renderHome(); }, 60000);
+// Also re-check date at midnight to update todayStr references
+setInterval(()=>{
+  const now=todayStr();
+  if(currentDailyDate!==now){ currentDailyDate=now; if(currentView==='home') renderHome(); }
+}, 60000);
 </script>
 </body>
 </html>
