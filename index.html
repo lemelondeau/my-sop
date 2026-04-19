@@ -415,27 +415,19 @@ function uuid() { return Date.now().toString(36) + Math.random().toString(36).sl
 function load(k) { try { return JSON.parse(localStorage.getItem(k))||null; } catch { return null; } }
 function save(k,d) { localStorage.setItem(k,JSON.stringify(d)); }
 
+const QUESTIONS_VERSION = 2;
 const DEFAULT_QUESTIONS = [
-  { id:uuid(), label:'身体状况', labelEn:'Health', category:'health', group:'life', type:'choice', options:['Very good / 很好','Good / 还不错','OK / 一般','Not good / 不太好'], order:1, active:true },
+  { id:uuid(), label:'身体状况', labelEn:'Health', category:'health', group:'life', type:'text', options:[], order:1, active:true },
   { id:uuid(), label:'运动', labelEn:'Exercise', category:'health', group:'life', type:'text', options:[], order:2, active:true },
-  { id:uuid(), label:'睡眠', labelEn:'Sleep (hours)', category:'health', group:'life', type:'number', options:[], order:3, active:true },
-  { id:uuid(), label:'起床时间', labelEn:'Wake-up time', category:'health', group:'life', type:'time', options:[], order:4, active:true },
-  { id:uuid(), label:'饮食', labelEn:'Diet', category:'health', group:'life', type:'text', options:[], order:5, active:true },
-  { id:uuid(), label:'心情', labelEn:'Mood', category:'mood', group:'life', type:'choice', options:['Great / 很好','OK / 还行','Low / 不太好','Bad / 很差'], order:6, active:true },
-  { id:uuid(), label:'开心的事', labelEn:'Happy things', category:'mood', group:'life', type:'text', options:[], order:7, active:true },
-  { id:uuid(), label:'感恩的事', labelEn:'Grateful for', category:'reflection', group:'life', type:'text', options:[], order:8, active:true },
-  { id:uuid(), label:'担忧的事', labelEn:'Worries', category:'reflection', group:'life', type:'text', options:[], order:9, active:true },
-  { id:uuid(), label:'一行日记', labelEn:'One-line diary', category:'reflection', group:'life', type:'text', options:[], order:10, active:true },
-  { id:uuid(), label:'对自己的意义', labelEn:'Significance to me', category:'reflection', group:'life', type:'text', options:[], order:11, active:true },
-  { id:uuid(), label:'新发现', labelEn:'New discovery', category:'reflection', group:'life', type:'text', options:[], order:12, active:true },
-  { id:uuid(), label:'工作时间', labelEn:'Working time (hours)', category:'productivity', group:'work', type:'number', options:[], order:13, active:true },
-  { id:uuid(), label:'效率', labelEn:'Productivity', category:'productivity', group:'work', type:'rating', options:[], order:14, active:true },
-  { id:uuid(), label:'拖延症', labelEn:'Procrastination (reason & fix)', category:'productivity', group:'work', type:'text', options:[], order:15, active:true },
-  { id:uuid(), label:'浪费时间/娱乐', labelEn:'Time wasted / Entertainment', category:'productivity', group:'work', type:'text', options:[], order:16, active:true },
-  { id:uuid(), label:'今日成就', labelEn:'Achievement', category:'reflection', group:'work', type:'text', options:[], order:17, active:true },
-  { id:uuid(), label:'做过的事', labelEn:'Things done', category:'reflection', group:'work', type:'text', options:[], order:18, active:true },
-  { id:uuid(), label:'接下来的行动', labelEn:'Next actions', category:'reflection', group:'work', type:'text', options:[], order:19, active:true },
-  { id:uuid(), label:'创意输出', labelEn:'Creative output', category:'reflection', group:'life', type:'text', options:[], order:20, active:true },
+  { id:uuid(), label:'躺下时间', labelEn:'Bedtime', category:'health', group:'life', type:'time', options:[], order:3, active:true },
+  { id:uuid(), label:'暴饮暴食', labelEn:'Overeating', category:'health', group:'life', type:'choice', options:['没有 / No','一点点 / A little','有 / Yes','严重 / A lot'], order:4, active:true },
+  { id:uuid(), label:'心情', labelEn:'Mood', category:'mood', group:'life', type:'choice', options:['Great / 很好','OK / 还行','Low / 不太好','Bad / 很差'], order:5, active:true },
+  { id:uuid(), label:'今天发生的好事', labelEn:'Good things today', category:'mood', group:'life', type:'text', options:[], order:6, active:true },
+  { id:uuid(), label:'今天的不愉快', labelEn:'Unpleasant things today', category:'mood', group:'life', type:'text', options:[], order:7, active:true },
+  { id:uuid(), label:'今日感悟', labelEn:'Today\'s reflection', category:'reflection', group:'life', type:'text', options:[], order:8, active:true },
+  { id:uuid(), label:'今日进步', labelEn:'Today\'s progress', category:'reflection', group:'life', type:'text', options:[], order:9, active:true },
+  { id:uuid(), label:'我太棒啦', labelEn:'I\'m awesome!', category:'reflection', group:'life', type:'text', options:[], order:10, active:true },
+  { id:uuid(), label:'我有一个主意', labelEn:'I have an idea!', category:'reflection', group:'life', type:'text', options:[], order:11, active:true },
 ];
 
 const DEFAULT_ROUTINES = [
@@ -451,16 +443,14 @@ const DEFAULT_ROUTINES = [
 ];
 
 function getQuestions() {
+  const storedVersion = localStorage.getItem('sop_questions_version');
+  if(!storedVersion || parseInt(storedVersion) < QUESTIONS_VERSION) {
+    save(SK.questions, DEFAULT_QUESTIONS);
+    localStorage.setItem('sop_questions_version', QUESTIONS_VERSION);
+    return DEFAULT_QUESTIONS;
+  }
   let q=load(SK.questions);
   if(!q){ q=DEFAULT_QUESTIONS; save(SK.questions,q); }
-  else { // Migrate: add group field if missing
-    let changed=false;
-    const workLabels=['工作时间','效率','拖延症','浪费时间/娱乐','今日成就','做过的事','接下来的行动'];
-    q.forEach(item=>{
-      if(!item.group){ item.group=workLabels.includes(item.label)?'work':'life'; changed=true; }
-    });
-    if(changed) save(SK.questions,q);
-  }
   return q;
 }
 function resetToDefaults() {
