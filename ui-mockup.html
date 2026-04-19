@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>My SOP - UI Design Preview</title>
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --card: #FFFFFF;
+    --primary: #5B7F6E;
+    --primary-light: #E8F0EC;
+    --primary-dark: #3D5A4C;
+    --accent: #E8985E;
+    --accent-light: #FFF3EB;
+    --text: #2C2C2C;
+    --text-secondary: #7A7A7A;
+    --text-light: #A8A8A8;
+    --border: #E8E6E1;
+    --danger: #D4564E;
+    --danger-light: #FDECEA;
+    --success: #5B7F6E;
+    --success-light: #E8F0EC;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+    --nav-height: 72px;
+    --header-height: 56px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    padding: 12px 20px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .header-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    color: var(--text-secondary);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  /* Views */
+  .view {
+    display: none;
+    padding: 0 20px 100px;
+    animation: fadeIn 0.25s ease;
+  }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: var(--nav-height);
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+    z-index: 200;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    color: var(--text-light);
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .nav-item.active { color: var(--primary); }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item.active .nav-icon { transform: scale(1.1); }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+  }
+
+  /* ========== HOME VIEW ========== */
+  .greeting {
+    padding: 8px 0 4px;
+  }
+  .greeting .date {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .greeting h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 2px;
+    letter-spacing: -0.5px;
+  }
+
+  .record-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(91,127,110,0.35);
+    margin: 16px 0;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .record-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(91,127,110,0.3);
+  }
+  .record-btn .icon { font-size: 22px; }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 20px 0 10px;
+  }
+
+  /* Routine Mini Card */
+  .routine-mini {
+    display: flex;
+    gap: 10px;
+  }
+  .routine-mini-card {
+    flex: 1;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+  .routine-mini-card .label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .routine-mini-card .progress-ring {
+    width: 50px;
+    height: 50px;
+    margin: 12px auto 4px;
+    position: relative;
+  }
+  .progress-ring svg { transform: rotate(-90deg); }
+  .progress-ring .pct {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .routine-mini-card .status {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+  }
+
+  /* Quick Stats */
+  .quick-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-item {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-item .stat-icon { font-size: 20px; margin-bottom: 4px; }
+  .stat-item .stat-value { font-size: 18px; font-weight: 700; color: var(--primary); }
+  .stat-item .stat-label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+  /* Recent Entry */
+  .recent-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .recent-entry:last-child { border-bottom: none; }
+  .recent-entry .day-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .recent-entry .day-badge .dow { font-size: 9px; font-weight: 600; color: var(--primary-dark); }
+  .recent-entry .entry-info { flex: 1; }
+  .recent-entry .entry-mood { font-size: 12px; color: var(--text-secondary); }
+  .recent-entry .entry-diary {
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .recent-entry .entry-arrow { color: var(--text-light); font-size: 14px; }
+
+  /* ========== RECORDING FLOW MODAL ========== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal-sheet {
+    background: var(--card);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 430px;
+    max-height: 85vh;
+    padding: 20px 24px 40px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .modal-progress .step-text {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  .modal-progress .close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .question-area {
+    min-height: 280px;
+  }
+  .question-category {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .question-label {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  .text-input:focus { border-color: var(--primary); }
+  .text-input::placeholder { color: var(--text-light); }
+
+  .choice-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice-option {
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+  }
+  .choice-option:hover { border-color: var(--primary-light); background: var(--primary-light); }
+  .choice-option.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .choice-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .choice-option.selected .choice-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .choice-option.selected .choice-dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* Rating Stars */
+  .rating-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 10px 0;
+  }
+  .rating-star {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--card);
+    font-weight: 700;
+    color: var(--text-light);
+  }
+  .rating-star.filled {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .btn-skip {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-next {
+    flex: 2;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-next:active { background: var(--primary-dark); }
+
+  /* ========== QUESTION VAULT ========== */
+  .vault-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .vault-header h2 { font-size: 20px; font-weight: 700; }
+  .add-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cat-tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .cat-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  .q-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .q-item:last-child { border-bottom: none; }
+  .q-drag { color: var(--text-light); font-size: 16px; cursor: grab; }
+  .q-info { flex: 1; }
+  .q-info .q-name { font-size: 15px; font-weight: 600; }
+  .q-info .q-type { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+  .q-toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .q-toggle.on { background: var(--primary); }
+  .q-toggle.off { background: var(--border); }
+  .q-toggle::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .q-toggle.on::after { left: 20px; }
+  .q-toggle.off::after { left: 2px; }
+
+  /* ========== MONTHLY VIEW ========== */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .month-nav h2 { font-size: 18px; font-weight: 700; }
+  .month-arrow {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .month-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .month-table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    background: var(--card);
+    font-size: 13px;
+  }
+  .month-table th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 11px;
+    text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  .month-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .month-table tr:hover { background: var(--primary-light); cursor: pointer; }
+  .mood-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .mood-great { background: #4CAF50; }
+  .mood-ok { background: #FFC107; }
+  .mood-low { background: #FF9800; }
+  .mood-bad { background: #f44336; }
+
+  /* ========== DAILY REVIEW ========== */
+  .daily-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .daily-header h2 { font-size: 20px; font-weight: 700; }
+
+  .field-card {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .field-card .field-label {
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .field-card .field-value {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .field-edit-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg);
+    color: var(--text-light);
+    font-size: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ========== ROUTINES VIEW ========== */
+  .routine-tabs {
+    display: flex;
+    gap: 0;
+    background: var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 20px;
+  }
+  .routine-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .routine-tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .routine-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+  }
+  .routine-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .routine-check.done {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    font-size: 12px;
+  }
+  .routine-item .r-label {
+    flex: 1;
+    font-size: 15px;
+  }
+  .routine-item .r-label.done-text {
+    text-decoration: line-through;
+    color: var(--text-light);
+  }
+  .routine-item .r-time {
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  .routine-summary {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  .routine-summary .big-pct {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  /* ========== COMPLETION SCREEN ========== */
+  .completion-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .completion-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+  }
+  .completion-screen h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .completion-screen p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .summary-items {
+    text-align: left;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .summary-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .summary-item:last-child { border: none; }
+  .summary-item .s-label { color: var(--text-secondary); min-width: 80px; }
+  .summary-item .s-value { color: var(--text); flex: 1; }
+  .btn-done {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Design label */
+  .design-label {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    padding: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 999;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+  body { padding-top: 28px; }
+</style>
+</head>
+<body>
+
+<div class="design-label">UI DESIGN PREVIEW - CLICK NAV TO EXPLORE</div>
+
+<!-- ====== HEADER ====== -->
+<div class="header">
+  <h1 id="page-title">My SOP</h1>
+  <div class="header-actions">
+    <button class="header-btn" title="Language">EN</button>
+    <button class="header-btn" title="Settings">&#9881;</button>
+  </div>
+</div>
+
+<!-- ====== HOME VIEW ====== -->
+<div class="view active" id="view-home">
+  <div class="greeting">
+    <div class="date">Sunday, April 19, 2026</div>
+    <h2>Good evening &#127769;</h2>
+  </div>
+
+  <button class="record-btn" onclick="showRecordFlow()">
+    <span class="icon">&#9998;</span>
+    Record My Day
+  </button>
+
+  <div class="section-label">Today's Routines</div>
+  <div class="routine-mini">
+    <div class="routine-mini-card" onclick="switchView('routines')">
+      <div class="label">&#9728;&#65039; Morning</div>
+      <div class="progress-ring">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" fill="none" stroke="#E8E6E1" stroke-width="4"/>
+          <circle cx="25" cy="25" r="20" fill="none" stroke="#5B7F6E" stroke-width="4"
+            stroke-dasharray="125.6" stroke-dashoffset="25" stroke-linecap="round"/>
+        </svg>
+        <div class="pct">80%</div>
+      </div>
+      <div class="status">4 of 5 done</div>
+    </div>
+    <div class="routine-mini-card" onclick="switchView('routines')">
+      <div class="label">&#127769; Evening</div>
+      <div class="progress-ring">
+        <svg width="50" height="50" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" fill="none" stroke="#E8E6E1" stroke-width="4"/>
+          <circle cx="25" cy="25" r="20" fill="none" stroke="#E8985E" stroke-width="4"
+            stroke-dasharray="125.6" stroke-dashoffset="94.2" stroke-linecap="round"/>
+        </svg>
+        <div class="pct" style="color:var(--accent)">25%</div>
+      </div>
+      <div class="status">1 of 4 done</div>
+    </div>
+  </div>
+
+  <div class="section-label">This Week</div>
+  <div class="quick-stats">
+    <div class="stat-item">
+      <div class="stat-icon">&#128170;</div>
+      <div class="stat-value">5/7</div>
+      <div class="stat-label">Exercise</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">&#128164;</div>
+      <div class="stat-value">7.2h</div>
+      <div class="stat-label">Avg Sleep</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">&#128578;</div>
+      <div class="stat-value">Good</div>
+      <div class="stat-label">Avg Mood</div>
+    </div>
+  </div>
+
+  <div class="section-label">Recent Entries</div>
+  <div class="card">
+    <div class="recent-entry" onclick="switchView('daily')">
+      <div class="day-badge"><span class="dow">SAT</span>18</div>
+      <div class="entry-info">
+        <div class="entry-mood"><span class="mood-dot mood-great"></span>Great mood</div>
+        <div class="entry-diary">Finished the report, had a great workout</div>
+      </div>
+      <div class="entry-arrow">&#8250;</div>
+    </div>
+    <div class="recent-entry" onclick="switchView('daily')">
+      <div class="day-badge"><span class="dow">FRI</span>17</div>
+      <div class="entry-info">
+        <div class="entry-mood"><span class="mood-dot mood-ok"></span>OK mood</div>
+        <div class="entry-diary">Meeting heavy day, managed to exercise</div>
+      </div>
+      <div class="entry-arrow">&#8250;</div>
+    </div>
+    <div class="recent-entry" onclick="switchView('daily')">
+      <div class="day-badge"><span class="dow">THU</span>16</div>
+      <div class="entry-info">
+        <div class="entry-mood"><span class="mood-dot mood-low"></span>Low mood</div>
+        <div class="entry-diary">Procrastinated, need to get back on track</div>
+      </div>
+      <div class="entry-arrow">&#8250;</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== QUESTION VAULT VIEW ====== -->
+<div class="view" id="view-vault">
+  <div class="vault-header">
+    <h2>Question Vault</h2>
+    <button class="add-btn">+ Add</button>
+  </div>
+
+  <div class="category-tabs">
+    <div class="cat-tab active">All</div>
+    <div class="cat-tab">Health</div>
+    <div class="cat-tab">Mood</div>
+    <div class="cat-tab">Productivity</div>
+    <div class="cat-tab">Reflection</div>
+  </div>
+
+  <div class="card">
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128153; Health &#183; &#36523;&#20307;&#29366;&#20917;</div>
+        <div class="q-type">Choice &#183; 4 options</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#127939; Exercise &#183; &#36816;&#21160;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128164; Sleep &#183; &#30561;&#30496;</div>
+        <div class="q-type">Number &#183; hours</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#127829; Diet &#183; &#39278;&#39135;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128522; Mood &#183; &#24515;&#24773;</div>
+        <div class="q-type">Choice &#183; 4 options</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#9200; Wake-up &#183; &#36215;&#24202;&#26102;&#38388;</div>
+        <div class="q-type">Time picker</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128200; Productivity &#183; &#25928;&#29575;</div>
+        <div class="q-type">Rating &#183; 1-5</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128591; Grateful for &#183; &#24863;&#24681;&#30340;&#20107;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#127942; Achievement &#183; &#20170;&#26085;&#25104;&#23601;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128221; One-line diary &#183; &#19968;&#34892;&#26085;&#35760;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle on"></button>
+    </div>
+    <div class="q-item">
+      <div class="q-drag">&#9776;</div>
+      <div class="q-info">
+        <div class="q-name">&#128161; New discovery &#183; &#26032;&#21457;&#29616;</div>
+        <div class="q-type">Text input</div>
+      </div>
+      <button class="q-toggle off"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MONTHLY VIEW ====== -->
+<div class="view" id="view-monthly">
+  <div class="month-nav">
+    <button class="month-arrow">&#8249;</button>
+    <h2>April 2026</h2>
+    <button class="month-arrow">&#8250;</button>
+  </div>
+
+  <div class="month-table-wrap">
+    <table class="month-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>&#24515;&#24773;</th>
+          <th>&#30561;&#30496;</th>
+          <th>&#36816;&#21160;</th>
+          <th>&#25928;&#29575;</th>
+          <th>&#19968;&#34892;&#26085;&#35760;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="switchView('daily')">
+          <td><strong>Apr 18</strong></td>
+          <td><span class="mood-dot mood-great"></span>Great</td>
+          <td>7.5h</td>
+          <td>&#127939; Run + abs</td>
+          <td>&#11088;&#11088;&#11088;&#11088;</td>
+          <td>Productive day!</td>
+        </tr>
+        <tr onclick="switchView('daily')">
+          <td><strong>Apr 17</strong></td>
+          <td><span class="mood-dot mood-ok"></span>OK</td>
+          <td>6h</td>
+          <td>&#128694; Walk</td>
+          <td>&#11088;&#11088;&#11088;</td>
+          <td>Meetings all day</td>
+        </tr>
+        <tr onclick="switchView('daily')">
+          <td><strong>Apr 16</strong></td>
+          <td><span class="mood-dot mood-low"></span>Low</td>
+          <td>5h</td>
+          <td>None</td>
+          <td>&#11088;&#11088;</td>
+          <td>Struggled to focus</td>
+        </tr>
+        <tr onclick="switchView('daily')">
+          <td><strong>Apr 15</strong></td>
+          <td><span class="mood-dot mood-great"></span>Great</td>
+          <td>8h</td>
+          <td>&#127939; Run</td>
+          <td>&#11088;&#11088;&#11088;&#11088;&#11088;</td>
+          <td>Best day this week</td>
+        </tr>
+        <tr onclick="switchView('daily')">
+          <td><strong>Apr 14</strong></td>
+          <td><span class="mood-dot mood-ok"></span>OK</td>
+          <td>7h</td>
+          <td>&#128170; Weights</td>
+          <td>&#11088;&#11088;&#11088;</td>
+          <td>Steady progress</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="text-align:center; margin-top:16px;">
+    <button class="add-btn" style="margin:0 auto;">Export CSV &#8595;</button>
+  </div>
+</div>
+
+<!-- ====== DAILY REVIEW VIEW ====== -->
+<div class="view" id="view-daily">
+  <div class="daily-header">
+    <button class="back-btn" onclick="switchView('monthly')">&#8249;</button>
+    <h2>Saturday, Apr 18</h2>
+  </div>
+
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128153; Health &#183; &#36523;&#20307;&#29366;&#20917;</div>
+      <div class="field-value">Good, felt energetic</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128522; Mood &#183; &#24515;&#24773;</div>
+      <div class="field-value"><span class="mood-dot mood-great"></span>Great</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128164; Sleep &#183; &#30561;&#30496;</div>
+      <div class="field-value">7.5 hours</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#127939; Exercise &#183; &#36816;&#21160;</div>
+      <div class="field-value">5km run + ab workout</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128200; Productivity &#183; &#25928;&#29575;</div>
+      <div class="field-value">&#11088;&#11088;&#11088;&#11088; (4/5)</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128591; Grateful for &#183; &#24863;&#24681;&#30340;&#20107;</div>
+      <div class="field-value">Had a great conversation with an old friend</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#127942; Achievement &#183; &#20170;&#26085;&#25104;&#23601;</div>
+      <div class="field-value">Finished the quarterly report ahead of deadline</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128221; One-line diary &#183; &#19968;&#34892;&#26085;&#35760;</div>
+      <div class="field-value">Productive day! Finished report and had a great run.</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+  <div class="field-card">
+    <div>
+      <div class="field-label">&#128161; New discovery &#183; &#26032;&#21457;&#29616;</div>
+      <div class="field-value">Found a new running route by the river</div>
+    </div>
+    <button class="field-edit-btn">&#9998;</button>
+  </div>
+</div>
+
+<!-- ====== ROUTINES VIEW ====== -->
+<div class="view" id="view-routines">
+  <h2 style="font-size:20px; font-weight:700; margin-bottom:16px;">My Routines</h2>
+
+  <div class="routine-tabs">
+    <button class="routine-tab active" onclick="this.parentElement.querySelectorAll('.routine-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active');">&#9728;&#65039; Morning</button>
+    <button class="routine-tab" onclick="this.parentElement.querySelectorAll('.routine-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active');">&#127769; Evening</button>
+  </div>
+
+  <div class="routine-summary">
+    <div class="big-pct">80%</div>
+    <div>4 of 5 completed today</div>
+  </div>
+
+  <div class="routine-item">
+    <div class="routine-check done">&#10003;</div>
+    <div class="r-label done-text">Drink a glass of water</div>
+    <div class="r-time">7:00</div>
+  </div>
+  <div class="routine-item">
+    <div class="routine-check done">&#10003;</div>
+    <div class="r-label done-text">10 min stretching</div>
+    <div class="r-time">7:10</div>
+  </div>
+  <div class="routine-item">
+    <div class="routine-check done">&#10003;</div>
+    <div class="r-label done-text">Review today's plan</div>
+    <div class="r-time">7:20</div>
+  </div>
+  <div class="routine-item">
+    <div class="routine-check done">&#10003;</div>
+    <div class="r-label done-text">Healthy breakfast</div>
+    <div class="r-time">7:30</div>
+  </div>
+  <div class="routine-item">
+    <div class="routine-check"></div>
+    <div class="r-label">Meditate 5 min</div>
+    <div class="r-time">7:45</div>
+  </div>
+
+  <div style="margin-top:20px;">
+    <button class="add-btn" style="width:100%;justify-content:center;padding:12px;">+ Add Routine Item</button>
+  </div>
+</div>
+
+<!-- ====== RECORDING FLOW MODAL ====== -->
+<div class="modal-overlay" id="record-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <!-- Step display -->
+    <div id="record-steps">
+      <!-- Step 1: Mood (Choice) -->
+      <div class="record-step" data-step="1">
+        <div class="modal-progress">
+          <span class="step-text">Question 1 of 5</span>
+          <button class="close-btn" onclick="closeRecordFlow()">&#10005;</button>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:20%"></div></div>
+        <div class="question-area">
+          <div class="question-category">Mood</div>
+          <div class="question-label">How are you feeling today?<br><span style="font-size:16px;color:var(--text-secondary);font-weight:400;">&#20170;&#22825;&#24515;&#24773;&#22914;&#20309;&#65311;</span></div>
+          <div class="choice-grid">
+            <div class="choice-option" onclick="selectChoice(this)">
+              <div class="choice-dot"></div>
+              <span>&#128516; Great &#183; &#24456;&#22909;</span>
+            </div>
+            <div class="choice-option selected" onclick="selectChoice(this)">
+              <div class="choice-dot"></div>
+              <span>&#128578; OK &#183; &#36824;&#34892;</span>
+            </div>
+            <div class="choice-option" onclick="selectChoice(this)">
+              <div class="choice-dot"></div>
+              <span>&#128533; Low &#183; &#19981;&#22826;&#22909;</span>
+            </div>
+            <div class="choice-option" onclick="selectChoice(this)">
+              <div class="choice-dot"></div>
+              <span>&#128542; Bad &#183; &#24456;&#24046;</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-skip" onclick="goStep(2)">Skip</button>
+          <button class="btn-next" onclick="goStep(2)">Next &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Sleep (Number) -->
+      <div class="record-step" data-step="2" style="display:none">
+        <div class="modal-progress">
+          <span class="step-text">Question 2 of 5</span>
+          <button class="close-btn" onclick="closeRecordFlow()">&#10005;</button>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:40%"></div></div>
+        <div class="question-area">
+          <div class="question-category">Health</div>
+          <div class="question-label">How many hours did you sleep?<br><span style="font-size:16px;color:var(--text-secondary);font-weight:400;">&#30561;&#20102;&#20960;&#20010;&#23567;&#26102;&#65311;</span></div>
+          <input type="number" class="text-input" placeholder="e.g. 7.5" value="7" style="font-size:28px;text-align:center;max-width:160px;margin:0 auto;display:block;">
+          <div style="text-align:center;margin-top:8px;color:var(--text-light);font-size:13px;">hours</div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-skip" onclick="goStep(3)">Skip</button>
+          <button class="btn-next" onclick="goStep(3)">Next &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Productivity (Rating) -->
+      <div class="record-step" data-step="3" style="display:none">
+        <div class="modal-progress">
+          <span class="step-text">Question 3 of 5</span>
+          <button class="close-btn" onclick="closeRecordFlow()">&#10005;</button>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:60%"></div></div>
+        <div class="question-area">
+          <div class="question-category">Productivity</div>
+          <div class="question-label">How productive were you?<br><span style="font-size:16px;color:var(--text-secondary);font-weight:400;">&#20170;&#22825;&#25928;&#29575;&#22914;&#20309;&#65311;</span></div>
+          <div class="rating-row">
+            <div class="rating-star filled" onclick="selectRating(this,1)">1</div>
+            <div class="rating-star filled" onclick="selectRating(this,2)">2</div>
+            <div class="rating-star filled" onclick="selectRating(this,3)">3</div>
+            <div class="rating-star" onclick="selectRating(this,4)">4</div>
+            <div class="rating-star" onclick="selectRating(this,5)">5</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;color:var(--text-light);font-size:11px;padding:0 4px;">
+            <span>Unproductive</span><span>Very productive</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-skip" onclick="goStep(4)">Skip</button>
+          <button class="btn-next" onclick="goStep(4)">Next &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Grateful (Text) -->
+      <div class="record-step" data-step="4" style="display:none">
+        <div class="modal-progress">
+          <span class="step-text">Question 4 of 5</span>
+          <button class="close-btn" onclick="closeRecordFlow()">&#10005;</button>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:80%"></div></div>
+        <div class="question-area">
+          <div class="question-category">Reflection</div>
+          <div class="question-label">What are you grateful for today?<br><span style="font-size:16px;color:var(--text-secondary);font-weight:400;">&#20170;&#22825;&#24863;&#24681;&#30340;&#20107;&#65311;</span></div>
+          <textarea class="text-input" rows="4" placeholder="Write anything you feel grateful for..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-skip" onclick="goStep(5)">Skip</button>
+          <button class="btn-next" onclick="goStep(5)">Next &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 5: One-line diary (Text) -->
+      <div class="record-step" data-step="5" style="display:none">
+        <div class="modal-progress">
+          <span class="step-text">Question 5 of 5</span>
+          <button class="close-btn" onclick="closeRecordFlow()">&#10005;</button>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:100%"></div></div>
+        <div class="question-area">
+          <div class="question-category">Reflection</div>
+          <div class="question-label">One-line diary<br><span style="font-size:16px;color:var(--text-secondary);font-weight:400;">&#19968;&#34892;&#26085;&#35760;</span></div>
+          <textarea class="text-input" rows="3" placeholder="Summarize your day in one sentence..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-skip" onclick="goStep(6)">Skip</button>
+          <button class="btn-next" onclick="goStep(6)" style="background:var(--accent);">Done &#10003;</button>
+        </div>
+      </div>
+
+      <!-- Completion -->
+      <div class="record-step" data-step="6" style="display:none">
+        <div class="completion-screen">
+          <div class="completion-icon">&#127881;</div>
+          <h3>Day Recorded!</h3>
+          <p>Sunday, April 19, 2026</p>
+          <div class="summary-items">
+            <div class="summary-item"><span class="s-label">Mood</span><span class="s-value">&#128578; OK</span></div>
+            <div class="summary-item"><span class="s-label">Sleep</span><span class="s-value">7 hours</span></div>
+            <div class="summary-item"><span class="s-label">Productivity</span><span class="s-value">&#11088;&#11088;&#11088; 3/5</span></div>
+            <div class="summary-item"><span class="s-label">Grateful</span><span class="s-value">-</span></div>
+            <div class="summary-item"><span class="s-label">Diary</span><span class="s-value">-</span></div>
+          </div>
+          <button class="btn-done" onclick="closeRecordFlow()">View Today's Record</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BOTTOM NAV ====== -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchView('home')">
+    <span class="nav-icon">&#127968;</span>
+    <span>Home</span>
+  </button>
+  <button class="nav-item" onclick="switchView('vault')">
+    <span class="nav-icon">&#128218;</span>
+    <span>Vault</span>
+  </button>
+  <button class="nav-item" onclick="switchView('monthly')">
+    <span class="nav-icon">&#128197;</span>
+    <span>Monthly</span>
+  </button>
+  <button class="nav-item" onclick="switchView('daily')">
+    <span class="nav-icon">&#128196;</span>
+    <span>Review</span>
+  </button>
+  <button class="nav-item" onclick="switchView('routines')">
+    <span class="nav-icon">&#9745;</span>
+    <span>Routines</span>
+  </button>
+</div>
+
+<script>
+  const titles = {
+    home: 'My SOP',
+    vault: 'Question Vault',
+    monthly: 'Monthly Records',
+    daily: 'Daily Review',
+    routines: 'Routines'
+  };
+
+  function switchView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navItems = document.querySelectorAll('.nav-item');
+    const idx = ['home','vault','monthly','daily','routines'].indexOf(name);
+    if (idx >= 0) navItems[idx].classList.add('active');
+    document.getElementById('page-title').textContent = titles[name] || 'My SOP';
+    window.scrollTo(0, 0);
+  }
+
+  function showRecordFlow() {
+    document.getElementById('record-modal').classList.add('active');
+    goStep(1);
+  }
+
+  function closeRecordFlow() {
+    document.getElementById('record-modal').classList.remove('active');
+  }
+
+  function goStep(n) {
+    document.querySelectorAll('.record-step').forEach(s => s.style.display = 'none');
+    const step = document.querySelector('.record-step[data-step="' + n + '"]');
+    if (step) step.style.display = 'block';
+  }
+
+  function selectChoice(el) {
+    el.parentElement.querySelectorAll('.choice-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectRating(el, val) {
+    const stars = el.parentElement.querySelectorAll('.rating-star');
+    stars.forEach((s, i) => {
+      if (i < val) s.classList.add('filled');
+      else s.classList.remove('filled');
+    });
+  }
+</script>
+
+</body>
+</html>
