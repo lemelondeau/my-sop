@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My SOP">
+<meta name="theme-color" content="#F7F6F3">
+<title>My SOP</title>
+<style>
+:root {
+  --bg: #F7F6F3; --card: #FFFFFF;
+  --primary: #5B7F6E; --primary-light: #E8F0EC; --primary-dark: #3D5A4C;
+  --accent: #E8985E; --accent-light: #FFF3EB;
+  --work: #5B6F8F; --work-light: #E8EDF4;
+  --text: #2C2C2C; --text-secondary: #7A7A7A; --text-light: #A8A8A8;
+  --border: #E8E6E1;
+  --danger: #D4564E; --danger-light: #FDECEA;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06); --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+  --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+  --nav-height: 72px; --header-height: 56px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background: var(--bg); color: var(--text);
+  max-width: 430px; margin: 0 auto; min-height: 100vh;
+  position: relative; overflow-x: hidden;
+  padding-top: env(safe-area-inset-top, 0);
+}
+.header {
+  position: sticky; top: 0; z-index: 100; background: var(--bg);
+  padding: 12px 20px 8px; display: flex; align-items: center; justify-content: space-between;
+  height: var(--header-height);
+}
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header-actions { display: flex; gap: 8px; }
+.header-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: var(--card); color: var(--text-secondary); font-size: 14px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow);
+}
+.view { display: none; padding: 0 20px 100px; animation: fadeIn 0.25s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px; height: var(--nav-height);
+  background: var(--card); border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom, 8px); z-index: 200;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; padding: 6px 12px; border-radius: 12px; transition: all 0.2s;
+  border: none; background: none; color: var(--text-light); font-size: 10px; font-weight: 500;
+}
+.nav-item.active { color: var(--primary); }
+.nav-item .nav-icon { font-size: 22px; }
+.card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.btn-primary {
+  padding: 14px 24px; border: none; border-radius: var(--radius-sm);
+  background: var(--primary); color: white; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; font-family: inherit;
+}
+.btn-primary:active { background: var(--primary-dark); }
+.btn-secondary {
+  padding: 14px 24px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--card); color: var(--text-secondary); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.add-btn {
+  padding: 8px 16px; border: none; border-radius: 20px; background: var(--primary);
+  color: white; font-size: 13px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px; font-family: inherit;
+}
+/* HOME */
+.greeting { padding: 8px 0 4px; }
+.greeting .date { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.greeting h2 { font-size: 26px; font-weight: 700; margin-top: 2px; letter-spacing: -0.5px; }
+.action-buttons { display: flex; gap: 10px; margin: 16px 0; }
+.action-btn {
+  flex: 1; padding: 16px 12px; border: none; border-radius: var(--radius);
+  color: white; font-size: 15px; font-weight: 600; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15); transition: transform 0.15s; font-family: inherit;
+}
+.action-btn:active { transform: scale(0.97); }
+.action-btn .action-icon { font-size: 24px; }
+.action-btn.quick { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.action-btn.edit-mode { background: linear-gradient(135deg, var(--work), #3D4F6C); }
+.section-label {
+  font-size: 13px; font-weight: 600; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.8px; margin: 20px 0 10px;
+}
+.routine-mini { display: flex; gap: 10px; }
+.routine-mini-card { flex: 1; background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); cursor: pointer; }
+.routine-mini-card .label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.routine-mini-card .progress-ring { width: 50px; height: 50px; margin: 12px auto 4px; position: relative; }
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring .pct { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 14px; font-weight: 700; color: var(--primary); }
+.routine-mini-card .status { text-align: center; font-size: 11px; color: var(--text-light); }
+.quick-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.stat-item { background: var(--card); border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; box-shadow: var(--shadow); }
+.stat-item .stat-icon { font-size: 20px; margin-bottom: 4px; }
+.stat-item .stat-value { font-size: 18px; font-weight: 700; color: var(--primary); }
+.stat-item .stat-label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+.recent-entry { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.recent-entry:last-child { border-bottom: none; }
+.recent-entry .day-badge {
+  width: 44px; height: 44px; border-radius: 12px; background: var(--primary-light);
+  color: var(--primary); display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-weight: 700; font-size: 16px; line-height: 1; flex-shrink: 0;
+}
+.recent-entry .day-badge .dow { font-size: 9px; font-weight: 600; color: var(--primary-dark); }
+.recent-entry .entry-info { flex: 1; min-width: 0; }
+.recent-entry .entry-mood { font-size: 12px; color: var(--text-secondary); }
+.recent-entry .entry-diary { font-size: 13px; color: var(--text); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-entry .entry-arrow { color: var(--text-light); font-size: 14px; }
+.mood-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.mood-great { background: #4CAF50; } .mood-ok { background: #FFC107; }
+.mood-low { background: #FF9800; } .mood-bad { background: #f44336; }
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); z-index: 500; align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.active { display: flex; }
+.modal-sheet {
+  background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px;
+  max-height: 88vh; padding: 20px 24px 40px; animation: slideUp 0.3s ease; overflow-y: auto;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.modal-progress { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.modal-progress .step-text { font-size: 12px; color: var(--text-light); font-weight: 500; }
+.close-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--bg);
+  color: var(--text-secondary); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 28px; overflow: hidden; }
+.progress-bar .fill { height: 100%; background: var(--primary); border-radius: 2px; transition: width 0.4s ease; }
+.question-area { min-height: 220px; }
+.question-category { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.question-label { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 20px; line-height: 1.3; }
+.question-sub { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+.text-input {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 16px; font-family: inherit; color: var(--text); background: var(--bg); outline: none;
+  transition: border-color 0.2s; resize: none;
+}
+.text-input:focus { border-color: var(--primary); }
+.text-input::placeholder { color: var(--text-light); }
+.choice-grid { display: flex; flex-direction: column; gap: 10px; }
+.choice-option {
+  padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center;
+  gap: 10px; background: var(--card);
+}
+.choice-option.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+.choice-dot {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.choice-option.selected .choice-dot { border-color: var(--primary); background: var(--primary); }
+.choice-option.selected .choice-dot::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; }
+.rating-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; }
+.rating-star {
+  width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  cursor: pointer; transition: all 0.15s; background: var(--card); font-weight: 700; color: var(--text-light);
+}
+.rating-star.filled { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.modal-actions { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.modal-actions .btn-skip { flex: 1; min-width: 0; }
+.modal-actions .btn-next { flex: 1.5; min-width: 0; }
+.btn-finish {
+  padding: 14px 12px; border: 2px solid var(--accent); border-radius: var(--radius-sm);
+  background: var(--accent-light); color: var(--accent); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; flex: 1; min-width: 0;
+}
+/* GROUP DIVIDER (recording flow) */
+.group-divider {
+  text-align: center; padding: 8px 0 4px; margin-bottom: 8px;
+}
+.group-badge {
+  display: inline-block; padding: 4px 14px; border-radius: 12px; font-size: 11px;
+  font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+}
+.group-badge.life { background: var(--primary-light); color: var(--primary-dark); }
+.group-badge.work { background: var(--work-light); color: var(--work); }
+/* VAULT */
+.vault-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.vault-header h2 { font-size: 20px; font-weight: 700; }
+.category-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+.cat-tab {
+  padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--card); color: var(--text-secondary);
+  white-space: nowrap; cursor: pointer; font-family: inherit;
+}
+.cat-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+.cat-tab.work-active { background: var(--work); color: white; border-color: var(--work); }
+.q-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.q-item:last-child { border-bottom: none; }
+.q-drag { color: var(--text-light); font-size: 16px; cursor: grab; user-select: none; }
+.q-info { flex: 1; cursor: pointer; }
+.q-info .q-name { font-size: 15px; font-weight: 600; }
+.q-info .q-type { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.q-toggle { width: 44px; height: 26px; border-radius: 13px; border: none; cursor: pointer; position: relative; transition: background 0.2s; }
+.q-toggle.on { background: var(--primary); } .q-toggle.off { background: var(--border); }
+.q-toggle::after {
+  content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%;
+  background: white; top: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.q-toggle.on::after { left: 20px; } .q-toggle.off::after { left: 2px; }
+/* GROUP SECTION HEADER */
+.group-section {
+  display: flex; align-items: center; gap: 10px; padding: 16px 0 8px;
+  border-bottom: 2px solid var(--border); margin-bottom: 4px;
+}
+.group-section .group-icon { font-size: 18px; }
+.group-section .group-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.group-section.life .group-title { color: var(--primary); }
+.group-section.work .group-title { color: var(--work); }
+/* MONTHLY */
+.month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.month-nav h2 { font-size: 18px; font-weight: 700; }
+.month-arrow {
+  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: var(--card); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; color: var(--text-secondary); font-family: inherit;
+}
+.month-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); box-shadow: var(--shadow); }
+.month-table { width: 100%; min-width: 600px; border-collapse: collapse; background: var(--card); font-size: 13px; }
+.month-table th {
+  background: var(--primary); color: white; padding: 10px 12px; font-weight: 600;
+  font-size: 11px; text-align: left; white-space: nowrap; position: sticky; top: 0;
+}
+.month-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+.month-table tr:active { background: var(--primary-light); }
+.month-table tbody tr { cursor: pointer; }
+/* DAILY / CREATE-EDIT */
+.daily-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: var(--card); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; color: var(--text-secondary);
+}
+.daily-header h2 { font-size: 18px; font-weight: 700; flex: 1; }
+.date-picker-wrap { margin-bottom: 16px; }
+.date-picker-wrap input[type="date"] {
+  width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 16px; font-family: inherit; color: var(--text); background: var(--bg); outline: none;
+}
+.date-picker-wrap input[type="date"]:focus { border-color: var(--primary); }
+.field-card {
+  background: var(--card); border-radius: var(--radius-sm); padding: 14px 16px;
+  margin-bottom: 10px; box-shadow: var(--shadow);
+}
+.field-card .field-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.field-card .field-label { font-size: 11px; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.field-card .field-value { font-size: 15px; color: var(--text); line-height: 1.4; word-break: break-word; }
+.field-card .field-value.empty { color: var(--text-light); font-style: italic; }
+.field-edit-btn {
+  width: 28px; height: 28px; border-radius: 8px; border: none; background: var(--bg);
+  color: var(--text-light); font-size: 12px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Inline edit in create-edit mode */
+.field-card .inline-input { margin-top: 8px; }
+.field-card .inline-input .text-input { font-size: 14px; padding: 10px 12px; }
+.field-card .inline-choice { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.inline-choice-opt {
+  padding: 6px 12px; border: 1.5px solid var(--border); border-radius: 16px;
+  font-size: 13px; cursor: pointer; background: var(--card); color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.inline-choice-opt.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+.inline-rating { margin-top: 8px; display: flex; gap: 6px; }
+.inline-rating .r-btn {
+  width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  cursor: pointer; background: var(--card); font-weight: 700; color: var(--text-light);
+}
+.inline-rating .r-btn.filled { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+/* ROUTINES */
+.routine-tabs { display: flex; gap: 0; background: var(--border); border-radius: var(--radius-sm); padding: 3px; margin-bottom: 20px; }
+.routine-tab {
+  flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: center; background: transparent; color: var(--text-secondary);
+  transition: all 0.2s; font-family: inherit;
+}
+.routine-tab.active { background: var(--card); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.routine-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  background: var(--card); border-radius: var(--radius-sm); margin-bottom: 8px; box-shadow: var(--shadow);
+}
+.routine-check {
+  width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: all 0.2s; flex-shrink: 0; font-size: 12px;
+}
+.routine-check.done { background: var(--primary); border-color: var(--primary); color: white; }
+.routine-item .r-label { flex: 1; font-size: 15px; }
+.routine-item .r-label.done-text { text-decoration: line-through; color: var(--text-light); }
+.routine-item .r-time { font-size: 12px; color: var(--text-light); }
+.routine-item .r-reminder { font-size: 11px; color: var(--accent); }
+.routine-summary { text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px; }
+.routine-summary .big-pct { font-size: 36px; font-weight: 700; color: var(--primary); }
+/* COMPLETION */
+.completion-screen { text-align: center; padding: 20px 0; }
+.completion-icon { font-size: 56px; margin-bottom: 12px; }
+.completion-screen h3 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.completion-screen p { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+.summary-items { text-align: left; max-height: 280px; overflow-y: auto; }
+.summary-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.summary-item:last-child { border: none; }
+.summary-item .s-label { color: var(--text-secondary); min-width: 90px; flex-shrink: 0; }
+.summary-item .s-value { color: var(--text); flex: 1; word-break: break-word; }
+/* EDIT MODAL */
+.edit-modal-content { padding: 0; }
+.edit-modal-content h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.edit-modal-content label { display: block; font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px; margin-top: 14px; }
+.edit-modal-content label:first-of-type { margin-top: 0; }
+.edit-actions { display: flex; gap: 10px; margin-top: 20px; }
+.edit-actions button { flex: 1; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.form-group select {
+  width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: inherit; color: var(--text); background: var(--bg); outline: none;
+  -webkit-appearance: none; appearance: none;
+}
+.form-group select:focus { border-color: var(--primary); }
+.options-list { margin-top: 8px; }
+.option-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+.option-row input { flex: 1; }
+.option-row .remove-opt {
+  width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--danger-light);
+  color: var(--danger); cursor: pointer; font-size: 14px; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.add-option-btn {
+  padding: 6px 12px; border: 1.5px dashed var(--border); border-radius: var(--radius-xs);
+  background: none; color: var(--text-light); font-size: 13px; cursor: pointer; width: 100%; font-family: inherit;
+}
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; margin-bottom: 16px; }
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--primary-dark); color: white; padding: 12px 24px;
+  border-radius: 24px; font-size: 14px; font-weight: 500; z-index: 999;
+  box-shadow: var(--shadow-lg); opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; max-width: 90%;
+}
+.toast.show { opacity: 1; }
+/* Save bar for create-edit */
+.save-bar {
+  position: sticky; bottom: 80px; left: 0; right: 0;
+  padding: 12px 0; display: flex; gap: 10px; z-index: 50;
+}
+.save-bar button { flex: 1; }
+/* Sync bar */
+.sync-bar {
+  display: flex; gap: 8px; padding: 10px 20px; margin: -4px -20px 12px;
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.sync-btn {
+  flex: 1; padding: 10px 8px; border: none; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: transform 0.15s;
+}
+.sync-btn:active { transform: scale(0.97); }
+.sync-btn.save-sync { background: #007AFF; color: white; }
+.sync-btn.load-sync { background: var(--primary-light); color: var(--primary-dark); }
+.sync-info { font-size: 11px; color: var(--text-light); text-align: center; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div class="header">
+  <h1 id="page-title">My SOP</h1>
+  <div class="header-actions">
+    <button class="header-btn" onclick="showSyncPanel()" title="Sync" style="font-size:16px">&#9729;</button>
+    <button class="header-btn" onclick="exportData()" title="Backup">&#8595;</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <input type="file" id="sync-load-file" accept=".json" style="display:none" onchange="loadFromICloud(event)">
+  </div>
+</div>
+<div class="view active" id="view-home"></div>
+<div class="view" id="view-vault"></div>
+<div class="view" id="view-monthly"></div>
+<div class="view" id="view-daily"></div>
+<div class="view" id="view-routines"></div>
+<div class="modal-overlay" id="record-modal"><div class="modal-sheet" id="record-sheet"></div></div>
+<div class="modal-overlay" id="edit-modal"><div class="modal-sheet" id="edit-sheet"></div></div>
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="switchView('home')"><span class="nav-icon">&#127968;</span><span>Home</span></button>
+  <button class="nav-item" onclick="switchView('vault')"><span class="nav-icon">&#128218;</span><span>Vault</span></button>
+  <button class="nav-item" onclick="switchView('monthly')"><span class="nav-icon">&#128197;</span><span>Monthly</span></button>
+  <button class="nav-item" onclick="switchView('routines')"><span class="nav-icon">&#9745;</span><span>Routines</span></button>
+</div>
+
+<script>
+// ================================================================
+// DATA LAYER
+// ================================================================
+const SK = { questions:'sop_questions', records:'sop_records', routines:'sop_routines', routineRecords:'sop_routine_records' };
+function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,9); }
+function load(k) { try { return JSON.parse(localStorage.getItem(k))||null; } catch { return null; } }
+function save(k,d) { localStorage.setItem(k,JSON.stringify(d)); }
+
+const DEFAULT_QUESTIONS = [
+  { id:uuid(), label:'身体状况', labelEn:'Health', category:'health', group:'life', type:'choice', options:['Very good / 很好','Good / 还不错','OK / 一般','Not good / 不太好'], order:1, active:true },
+  { id:uuid(), label:'运动', labelEn:'Exercise', category:'health', group:'life', type:'text', options:[], order:2, active:true },
+  { id:uuid(), label:'睡眠', labelEn:'Sleep (hours)', category:'health', group:'life', type:'number', options:[], order:3, active:true },
+  { id:uuid(), label:'起床时间', labelEn:'Wake-up time', category:'health', group:'life', type:'time', options:[], order:4, active:true },
+  { id:uuid(), label:'饮食', labelEn:'Diet', category:'health', group:'life', type:'text', options:[], order:5, active:true },
+  { id:uuid(), label:'心情', labelEn:'Mood', category:'mood', group:'life', type:'choice', options:['Great / 很好','OK / 还行','Low / 不太好','Bad / 很差'], order:6, active:true },
+  { id:uuid(), label:'开心的事', labelEn:'Happy things', category:'mood', group:'life', type:'text', options:[], order:7, active:true },
+  { id:uuid(), label:'感恩的事', labelEn:'Grateful for', category:'reflection', group:'life', type:'text', options:[], order:8, active:true },
+  { id:uuid(), label:'担忧的事', labelEn:'Worries', category:'reflection', group:'life', type:'text', options:[], order:9, active:true },
+  { id:uuid(), label:'一行日记', labelEn:'One-line diary', category:'reflection', group:'life', type:'text', options:[], order:10, active:true },
+  { id:uuid(), label:'对自己的意义', labelEn:'Significance to me', category:'reflection', group:'life', type:'text', options:[], order:11, active:true },
+  { id:uuid(), label:'新发现', labelEn:'New discovery', category:'reflection', group:'life', type:'text', options:[], order:12, active:true },
+  { id:uuid(), label:'工作时间', labelEn:'Working time (hours)', category:'productivity', group:'work', type:'number', options:[], order:13, active:true },
+  { id:uuid(), label:'效率', labelEn:'Productivity', category:'productivity', group:'work', type:'rating', options:[], order:14, active:true },
+  { id:uuid(), label:'拖延症', labelEn:'Procrastination (reason & fix)', category:'productivity', group:'work', type:'text', options:[], order:15, active:true },
+  { id:uuid(), label:'浪费时间/娱乐', labelEn:'Time wasted / Entertainment', category:'productivity', group:'work', type:'text', options:[], order:16, active:true },
+  { id:uuid(), label:'今日成就', labelEn:'Achievement', category:'reflection', group:'work', type:'text', options:[], order:17, active:true },
+  { id:uuid(), label:'做过的事', labelEn:'Things done', category:'reflection', group:'work', type:'text', options:[], order:18, active:true },
+  { id:uuid(), label:'接下来的行动', labelEn:'Next actions', category:'reflection', group:'work', type:'text', options:[], order:19, active:true },
+];
+
+const DEFAULT_ROUTINES = [
+  { id:uuid(), label:'Drink water / 喝水', type:'morning', order:1, active:true, reminderTime:'' },
+  { id:uuid(), label:'Stretch 10 min / 拉伸', type:'morning', order:2, active:true, reminderTime:'' },
+  { id:uuid(), label:'Review today\'s plan / 看今天计划', type:'morning', order:3, active:true, reminderTime:'' },
+  { id:uuid(), label:'Healthy breakfast / 健康早餐', type:'morning', order:4, active:true, reminderTime:'' },
+  { id:uuid(), label:'Meditate 5 min / 冥想', type:'morning', order:5, active:true, reminderTime:'' },
+  { id:uuid(), label:'Record my day / 记录今天', type:'evening', order:1, active:true, reminderTime:'' },
+  { id:uuid(), label:'Skincare / 护肤', type:'evening', order:2, active:true, reminderTime:'' },
+  { id:uuid(), label:'Read 15 min / 阅读', type:'evening', order:3, active:true, reminderTime:'' },
+  { id:uuid(), label:'Plan tomorrow / 计划明天', type:'evening', order:4, active:true, reminderTime:'' },
+];
+
+function getQuestions() {
+  let q=load(SK.questions);
+  if(!q){ q=DEFAULT_QUESTIONS; save(SK.questions,q); }
+  else { // Migrate: add group field if missing
+    let changed=false;
+    const workLabels=['工作时间','效率','拖延症','浪费时间/娱乐','今日成就','做过的事','接下来的行动'];
+    q.forEach(item=>{
+      if(!item.group){ item.group=workLabels.includes(item.label)?'work':'life'; changed=true; }
+    });
+    if(changed) save(SK.questions,q);
+  }
+  return q;
+}
+function resetToDefaults() {
+  if(!confirm('Reset all questions to defaults? Your existing records will be kept, but question IDs will change so old records may not map correctly.')) return;
+  save(SK.questions, DEFAULT_QUESTIONS);
+  showToast('Questions reset to defaults!');
+  renderVault();
+}
+function saveQuestions(q) { save(SK.questions,q); }
+function getRecords() { return load(SK.records)||{}; }
+function saveRecords(r) { save(SK.records,r); }
+function getRecord(d) { return getRecords()[d]||null; }
+function saveRecord(d,data) { const r=getRecords(); r[d]={...data,date:d,updatedAt:Date.now()}; saveRecords(r); }
+function getRoutines() { let r=load(SK.routines); if(!r){r=DEFAULT_ROUTINES;save(SK.routines,r);} return r; }
+function saveRoutines(r) { save(SK.routines,r); }
+function getRoutineRecords() { return load(SK.routineRecords)||{}; }
+function saveRoutineRecords(r) { save(SK.routineRecords,r); }
+function toggleRoutineRecord(rid,date) { const rr=getRoutineRecords(); const k=date+'_'+rid; if(rr[k])delete rr[k]; else rr[k]={completedAt:Date.now()}; saveRoutineRecords(rr); }
+function isRoutineDone(rid,date) { return !!getRoutineRecords()[date+'_'+rid]; }
+
+// ================================================================
+// HELPERS
+// ================================================================
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function fmtFull(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+function fmtShort(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function getDow(ds) { return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{weekday:'short'}).toUpperCase(); }
+function getDay(ds) { return new Date(ds+'T00:00:00').getDate(); }
+function getMonthKey(ds) { return ds.slice(0,7); }
+function monthLabel(mk) { const[y,m]=mk.split('-'); const ms=['January','February','March','April','May','June','July','August','September','October','November','December']; return ms[parseInt(m)-1]+' '+y; }
+function getGreeting() { const h=new Date().getHours(); if(h<12)return'Good morning'; if(h<18)return'Good afternoon'; return'Good evening'; }
+function getMoodClass(v) { if(!v)return''; const l=v.toLowerCase(); if(l.includes('great')||l.includes('very good')||l.includes('很好'))return'mood-great'; if(l.includes('ok')||l.includes('还行')||l.includes('还不错'))return'mood-ok'; if(l.includes('low')||l.includes('不太好')||l.includes('一般'))return'mood-low'; if(l.includes('bad')||l.includes('很差'))return'mood-bad'; return'mood-ok'; }
+function getMoodLabel(v) { return v?(v.split(' / ')[0]||v):''; }
+function getGroupIcon(g) { return g==='work'?'&#128188;':'&#127793;'; }
+function getCatIcon(c) { return{health:'&#128154;',mood:'&#128522;',productivity:'&#128200;',reflection:'&#128221;'}[c]||'&#128203;'; }
+function getTypeLabel(t) { return{text:'Text',choice:'Choice',number:'Number',time:'Time',rating:'Rating 1-5'}[t]||t; }
+function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function esc(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+let currentView='home', currentMonth=getMonthKey(todayStr()), currentDailyDate=todayStr();
+let currentRoutineTab='morning', vaultGroup='all', editMode=false;
+const titles={home:'My SOP',vault:'Question Vault',monthly:'Monthly Records',daily:'Daily Review',routines:'Routines'};
+
+function switchView(name,opts) {
+  currentView=name;
+  if(opts?.date) currentDailyDate=opts.date;
+  if(opts?.editMode!==undefined) editMode=opts.editMode;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const idx=['home','vault','monthly','routines'].indexOf(name==='daily'?'monthly':name);
+  if(idx>=0) document.querySelectorAll('.nav-item')[idx].classList.add('active');
+  document.getElementById('page-title').textContent=titles[name]||'My SOP';
+  renderView(name);
+  window.scrollTo(0,0);
+}
+function renderView(n) {
+  switch(n) {
+    case'home':renderHome();break; case'vault':renderVault();break;
+    case'monthly':renderMonthly();break; case'daily':renderDaily();break;
+    case'routines':renderRoutines();break;
+  }
+}
+
+// ================================================================
+// HOME
+// ================================================================
+function renderHome() {
+  const today=todayStr(), records=getRecords(), routines=getRoutines();
+  const mr=routines.filter(r=>r.type==='morning'&&r.active), er=routines.filter(r=>r.type==='evening'&&r.active);
+  const md=mr.filter(r=>isRoutineDone(r.id,today)).length, ed=er.filter(r=>isRoutineDone(r.id,today)).length;
+  const mp=mr.length?Math.round(md/mr.length*100):0, ep=er.length?Math.round(ed/er.length*100):0;
+  const questions=getQuestions(), moodQ=questions.find(q=>q.label==='心情'), diaryQ=questions.find(q=>q.label==='一行日记');
+  const sortedDates=Object.keys(records).sort().reverse().slice(0,5);
+  function ring(p,c) { const ci=2*Math.PI*20,o=ci-(ci*p/100); return`<svg width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#E8E6E1" stroke-width="4"/><circle cx="25" cy="25" r="20" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${ci}" stroke-dashoffset="${o}" stroke-linecap="round"/></svg>`; }
+  const weekDates=[]; for(let i=6;i>=0;i--){ const d=new Date();d.setDate(d.getDate()-i);weekDates.push(d.toISOString().slice(0,10)); }
+  const sleepQ=questions.find(q=>q.label==='睡眠'), exerciseQ=questions.find(q=>q.label==='运动');
+  let sT=0,sC=0,eD=0;
+  weekDates.forEach(d=>{const rec=records[d];if(rec&&sleepQ&&rec.responses?.[sleepQ.id]){sT+=parseFloat(rec.responses[sleepQ.id])||0;sC++;}if(rec&&exerciseQ&&rec.responses?.[exerciseQ.id])eD++;});
+  const hasToday=!!records[today];
+
+  document.getElementById('view-home').innerHTML=`
+    <div class="greeting"><div class="date">${fmtFull(today)}</div><h2>${getGreeting()} &#127769;</h2></div>
+    <div class="action-buttons">
+      <button class="action-btn quick" onclick="startRecording()">
+        <span class="action-icon">&#9998;</span>${hasToday?'Quick Update':'Quick Record'}
+      </button>
+      <button class="action-btn edit-mode" onclick="openCreateEdit('${today}')">
+        <span class="action-icon">&#128196;</span>Create & Edit
+      </button>
+    </div>
+    <div class="section-label">Today's Routines</div>
+    <div class="routine-mini">
+      <div class="routine-mini-card" onclick="currentRoutineTab='morning';switchView('routines')">
+        <div class="label">&#9728;&#65039; Morning</div>
+        <div class="progress-ring">${ring(mp,'#5B7F6E')}<div class="pct">${mp}%</div></div>
+        <div class="status">${md} of ${mr.length} done</div>
+      </div>
+      <div class="routine-mini-card" onclick="currentRoutineTab='evening';switchView('routines')">
+        <div class="label">&#127769; Evening</div>
+        <div class="progress-ring">${ring(ep,'#E8985E')}<div class="pct" style="color:var(--accent)">${ep}%</div></div>
+        <div class="status">${ed} of ${er.length} done</div>
+      </div>
+    </div>
+    <div class="section-label">This Week</div>
+    <div class="quick-stats">
+      <div class="stat-item"><div class="stat-icon">&#128170;</div><div class="stat-value">${eD}/7</div><div class="stat-label">Exercise</div></div>
+      <div class="stat-item"><div class="stat-icon">&#128164;</div><div class="stat-value">${sC?(sT/sC).toFixed(1)+'h':'--'}</div><div class="stat-label">Avg Sleep</div></div>
+      <div class="stat-item"><div class="stat-icon">&#128197;</div><div class="stat-value">${Object.keys(records).filter(d=>weekDates.includes(d)).length}/7</div><div class="stat-label">Recorded</div></div>
+    </div>
+    <div class="section-label">Recent Entries</div>
+    ${sortedDates.length?`<div class="card">${sortedDates.map(d=>{const rec=records[d];const mood=moodQ&&rec.responses?.[moodQ.id]?rec.responses[moodQ.id]:'';const diary=diaryQ&&rec.responses?.[diaryQ.id]?rec.responses[diaryQ.id]:'';return`<div class="recent-entry" onclick="openCreateEdit('${d}')"><div class="day-badge"><span class="dow">${getDow(d)}</span>${getDay(d)}</div><div class="entry-info"><div class="entry-mood"><span class="mood-dot ${getMoodClass(mood)}"></span>${getMoodLabel(mood)||'No mood'}</div><div class="entry-diary">${diary||'No diary entry'}</div></div><div class="entry-arrow">&#8250;</div></div>`;}).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">&#128221;</div><p>No records yet. Start recording!</p></div>`}`;
+}
+
+// ================================================================
+// RECORDING FLOW (with Finish button + group dividers)
+// ================================================================
+let recStep=0, recResp={}, activeQs=[];
+function startRecording() {
+  const qs=getQuestions().filter(q=>q.active).sort((a,b)=>a.order-b.order);
+  // Sort: life first, then work
+  const life=qs.filter(q=>q.group==='life'), work=qs.filter(q=>q.group==='work');
+  activeQs=[...life,...work];
+  if(!activeQs.length){showToast('No active questions!');return;}
+  recStep=0;
+  const existing=getRecord(todayStr());
+  recResp=existing?.responses?{...existing.responses}:{};
+  document.getElementById('record-modal').classList.add('active');
+  renderRecStep();
+}
+function renderRecStep() {
+  const sheet=document.getElementById('record-sheet');
+  if(recStep>=activeQs.length) { showRecCompletion(sheet); return; }
+  const q=activeQs[recStep], total=activeQs.length, pct=Math.round(((recStep+1)/total)*100);
+  const cv=recResp[q.id]||'';
+  // Check if this is the first question of a new group
+  const prevGroup=recStep>0?activeQs[recStep-1].group:null;
+  const showGroupHeader=q.group!==prevGroup;
+  let groupHtml='';
+  if(showGroupHeader) groupHtml=`<div class="group-divider"><span class="group-badge ${q.group}">${q.group==='life'?'&#127793; Life':'&#128188; Work'}</span></div>`;
+  let inputHtml='';
+  if(q.type==='text') inputHtml=`<textarea class="text-input" rows="4" id="rec-input" placeholder="Write here...">${cv}</textarea>`;
+  else if(q.type==='number') inputHtml=`<input type="number" class="text-input" id="rec-input" placeholder="e.g. 7.5" value="${cv}" style="font-size:28px;text-align:center;max-width:200px;margin:0 auto;display:block" step="0.5">`;
+  else if(q.type==='time') inputHtml=`<input type="time" class="text-input" id="rec-input" value="${cv}" style="font-size:28px;text-align:center;max-width:200px;margin:0 auto;display:block">`;
+  else if(q.type==='choice') inputHtml=`<div class="choice-grid">${q.options.map(o=>`<div class="choice-option ${cv===o?'selected':''}" onclick="selRecChoice(this,'${esc(o)}')"><div class="choice-dot"></div><span>${o}</span></div>`).join('')}</div>`;
+  else if(q.type==='rating') { const cr=parseInt(cv)||0; inputHtml=`<div class="rating-row">${[1,2,3,4,5].map(n=>`<div class="rating-star ${n<=cr?'filled':''}" onclick="selRecRating(${n})">${n}</div>`).join('')}</div><div style="display:flex;justify-content:space-between;color:var(--text-light);font-size:11px;padding:0 4px"><span>Low</span><span>High</span></div>`; }
+  const isLast=recStep===total-1;
+  sheet.innerHTML=`<div class="modal-handle"></div>
+    <div class="modal-progress"><span class="step-text">Question ${recStep+1} of ${total}</span><button class="close-btn" onclick="closeRec()">&#10005;</button></div>
+    <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+    ${groupHtml}
+    <div class="question-area">
+      <div class="question-category">${q.group} · ${q.category}</div>
+      <div class="question-label">${q.labelEn}<br><span class="question-sub">${q.label}</span></div>
+      ${inputHtml}
+    </div>
+    <div class="modal-actions">
+      ${recStep>0?`<button class="btn-secondary btn-skip" onclick="recPrev()">&#8592;</button>`:`<button class="btn-secondary btn-skip" onclick="recSkip()">Skip</button>`}
+      <button class="btn-finish" onclick="recFinish()">Finish & Save</button>
+      <button class="btn-primary btn-next" onclick="recNext()" ${isLast?'style="background:var(--accent)"':''}>${isLast?'Done &#10003;':'Next &#8594;'}</button>
+    </div>`;
+}
+function showRecCompletion(sheet) {
+  const answered=activeQs.filter(q=>recResp[q.id]);
+  const summaryHtml=activeQs.map(q=>{let v=recResp[q.id]||'-';if(q.type==='rating'&&v!=='-')v='&#11088;'.repeat(parseInt(v))+` (${v}/5)`;return`<div class="summary-item"><span class="s-label">${q.label}</span><span class="s-value">${v}</span></div>`;}).join('');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="completion-screen">
+    <div class="completion-icon">&#127881;</div><h3>Day Recorded!</h3>
+    <p>${fmtFull(todayStr())} · ${answered.length}/${activeQs.length} answered</p>
+    <div class="summary-items">${summaryHtml}</div>
+    <button class="btn-primary" style="width:100%;margin-top:20px" onclick="finishRec()">View Today's Record</button></div>`;
+  saveRecord(todayStr(),{responses:recResp,createdAt:getRecord(todayStr())?.createdAt||Date.now()});
+}
+function selRecChoice(el,v) { el.parentElement.querySelectorAll('.choice-option').forEach(o=>o.classList.remove('selected')); el.classList.add('selected'); recResp[activeQs[recStep].id]=v; }
+function selRecRating(n) { recResp[activeQs[recStep].id]=String(n); document.querySelectorAll('.rating-star').forEach((s,i)=>{if(i<n)s.classList.add('filled');else s.classList.remove('filled');}); }
+function collectInput() { const q=activeQs[recStep]; if(q.type==='text'||q.type==='number'||q.type==='time'){const inp=document.getElementById('rec-input');if(inp&&inp.value.trim())recResp[q.id]=inp.value.trim();} }
+function recNext() { collectInput(); recStep++; renderRecStep(); }
+function recPrev() { collectInput(); recStep--; renderRecStep(); }
+function recSkip() { recStep++; renderRecStep(); }
+function recFinish() {
+  collectInput();
+  // Save what we have and show completion
+  recStep=activeQs.length;
+  renderRecStep();
+}
+function closeRec() { document.getElementById('record-modal').classList.remove('active'); renderHome(); }
+function finishRec() { document.getElementById('record-modal').classList.remove('active'); openCreateEdit(todayStr()); }
+
+// ================================================================
+// CREATE & EDIT VIEW (form-based editing)
+// ================================================================
+function openCreateEdit(date) {
+  currentDailyDate=date;
+  editMode=true;
+  switchView('daily',{date,editMode:true});
+}
+function renderDaily() {
+  const date=currentDailyDate;
+  const record=getRecord(date);
+  const questions=getQuestions().sort((a,b)=>a.order-b.order);
+  const lifeQs=questions.filter(q=>q.group==='life');
+  const workQs=questions.filter(q=>q.group==='work');
+  document.getElementById('page-title').textContent=editMode?'Create & Edit':'Daily Review';
+
+  function renderGroup(label, icon, groupClass, qs) {
+    if(!qs.length) return '';
+    return `<div class="group-section ${groupClass}"><span class="group-icon">${icon}</span><span class="group-title">${label}</span></div>`+
+      qs.map(q=>{
+        const val=record?.responses?.[q.id]||'';
+        if(editMode) return renderEditableField(q,val,date);
+        let display=val;
+        if(q.type==='rating'&&val) display='&#11088;'.repeat(parseInt(val))+` (${val}/5)`;
+        if(q.label==='心情'&&val) display=`<span class="mood-dot ${getMoodClass(val)}"></span>${getMoodLabel(val)}`;
+        return `<div class="field-card"><div class="field-top"><div style="flex:1;min-width:0"><div class="field-label">${getCatIcon(q.category)} ${q.labelEn} · ${q.label}</div><div class="field-value ${!val?'empty':''}">${display||'Not recorded'}</div></div><button class="field-edit-btn" onclick="editField('${date}','${q.id}')">&#9998;</button></div></div>`;
+      }).join('');
+  }
+
+  document.getElementById('view-daily').innerHTML=`
+    <div class="daily-header">
+      <button class="back-btn" onclick="editMode=false;switchView(currentView==='daily'?'monthly':'home')">&#8249;</button>
+      <h2>${editMode?'Create & Edit':'Review'}</h2>
+      ${!editMode?`<button class="add-btn" onclick="editMode=true;renderDaily()">&#9998; Edit All</button>`:`<button class="add-btn" style="background:var(--text-light)" onclick="editMode=false;renderDaily()">View Mode</button>`}
+    </div>
+    ${editMode?`<div class="date-picker-wrap"><input type="date" value="${date}" onchange="currentDailyDate=this.value;renderDaily()"></div>`:`<p style="color:var(--text-secondary);font-size:14px;margin-bottom:16px">${fmtFull(date)}</p>`}
+    ${renderGroup('Life','&#127793;','life',lifeQs)}
+    ${renderGroup('Work','&#128188;','work',workQs)}
+    ${editMode?`<div class="save-bar"><button class="btn-primary" onclick="saveAllFields()">&#10003; Save All Changes</button></div>`:''}
+    ${!record&&!editMode?`<div class="empty-state"><div class="empty-icon">&#128221;</div><p>No record for this day</p><button class="btn-primary" onclick="editMode=true;renderDaily()">Create Record</button></div>`:''}`;
+}
+
+function renderEditableField(q, val, date) {
+  const fid='ef_'+q.id;
+  let inputHtml='';
+  if(q.type==='text') inputHtml=`<div class="inline-input"><textarea class="text-input" id="${fid}" rows="2" placeholder="Write here...">${val}</textarea></div>`;
+  else if(q.type==='number') inputHtml=`<div class="inline-input"><input type="number" class="text-input" id="${fid}" value="${val}" placeholder="e.g. 7.5" step="0.5"></div>`;
+  else if(q.type==='time') inputHtml=`<div class="inline-input"><input type="time" class="text-input" id="${fid}" value="${val}"></div>`;
+  else if(q.type==='choice') inputHtml=`<div class="inline-choice" id="${fid}">${q.options.map(o=>`<span class="inline-choice-opt ${val===o?'selected':''}" onclick="this.parentElement.querySelectorAll('.inline-choice-opt').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')">${o}</span>`).join('')}</div>`;
+  else if(q.type==='rating') { const cr=parseInt(val)||0; inputHtml=`<div class="inline-rating" id="${fid}">${[1,2,3,4,5].map(n=>`<div class="r-btn ${n<=cr?'filled':''}" onclick="this.parentElement.querySelectorAll('.r-btn').forEach((s,i)=>{if(i<${n})s.classList.add('filled');else s.classList.remove('filled')})">${n}</div>`).join('')}</div>`; }
+  return `<div class="field-card"><div class="field-label">${getCatIcon(q.category)} ${q.labelEn} · ${q.label}</div>${inputHtml}</div>`;
+}
+
+function saveAllFields() {
+  const date=currentDailyDate;
+  const questions=getQuestions();
+  const record=getRecord(date)||{responses:{},createdAt:Date.now()};
+  questions.forEach(q=>{
+    const fid='ef_'+q.id;
+    if(q.type==='text'||q.type==='number'||q.type==='time') {
+      const el=document.getElementById(fid);
+      if(el) record.responses[q.id]=el.value.trim();
+    } else if(q.type==='choice') {
+      const sel=document.querySelector('#'+fid+' .inline-choice-opt.selected');
+      if(sel) record.responses[q.id]=sel.textContent;
+    } else if(q.type==='rating') {
+      const filled=document.querySelectorAll('#'+fid+' .r-btn.filled');
+      record.responses[q.id]=String(filled.length);
+    }
+  });
+  saveRecord(date,record);
+  showToast('Saved!');
+  editMode=false;
+  renderDaily();
+}
+
+function editField(date,qId) {
+  const q=getQuestions().find(x=>x.id===qId); if(!q)return;
+  const record=getRecord(date); const cv=record?.responses?.[qId]||'';
+  let inputHtml='';
+  if(q.type==='text') inputHtml=`<textarea class="text-input" rows="3" id="edit-input">${cv}</textarea>`;
+  else if(q.type==='number') inputHtml=`<input type="number" class="text-input" id="edit-input" value="${cv}" step="0.5">`;
+  else if(q.type==='time') inputHtml=`<input type="time" class="text-input" id="edit-input" value="${cv}">`;
+  else if(q.type==='choice') inputHtml=`<div class="choice-grid" id="edit-choices">${q.options.map(o=>`<div class="choice-option ${cv===o?'selected':''}" onclick="this.parentElement.querySelectorAll('.choice-option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected')"><div class="choice-dot"></div><span>${o}</span></div>`).join('')}</div>`;
+  else if(q.type==='rating') { const cr=parseInt(cv)||0; inputHtml=`<div class="rating-row" id="edit-rating">${[1,2,3,4,5].map(n=>`<div class="rating-star ${n<=cr?'filled':''}" onclick="this.parentElement.querySelectorAll('.rating-star').forEach((s,i)=>{if(i<${n})s.classList.add('filled');else s.classList.remove('filled')})">${n}</div>`).join('')}</div>`; }
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content"><h3>${q.labelEn} · ${q.label}</h3>${inputHtml}<div class="edit-actions"><button class="btn-secondary" onclick="closeEditModal()">Cancel</button><button class="btn-primary" onclick="saveField('${date}','${qId}')">Save</button></div></div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+function saveField(date,qId) {
+  const q=getQuestions().find(x=>x.id===qId); let val='';
+  if(q.type==='text'||q.type==='number'||q.type==='time') val=document.getElementById('edit-input').value.trim();
+  else if(q.type==='choice'){const s=document.querySelector('#edit-choices .choice-option.selected span');val=s?s.textContent:'';}
+  else if(q.type==='rating'){val=String(document.querySelectorAll('#edit-rating .rating-star.filled').length);}
+  const record=getRecord(date)||{responses:{},createdAt:Date.now()};
+  record.responses[qId]=val; saveRecord(date,record);
+  closeEditModal(); renderDaily(); showToast('Updated!');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('active'); }
+
+// ================================================================
+// QUESTION VAULT (with group tabs)
+// ================================================================
+function renderVault() {
+  const questions=getQuestions().sort((a,b)=>a.order-b.order);
+  let filtered=questions;
+  if(vaultGroup==='life') filtered=questions.filter(q=>q.group==='life');
+  else if(vaultGroup==='work') filtered=questions.filter(q=>q.group==='work');
+
+  document.getElementById('view-vault').innerHTML=`
+    <div class="vault-header"><h2>Question Vault</h2><div style="display:flex;gap:8px"><button class="add-btn" style="background:var(--text-light)" onclick="resetToDefaults()">Reset</button><button class="add-btn" onclick="editQuestion()">+ Add</button></div></div>
+    <div class="category-tabs">
+      <button class="cat-tab ${vaultGroup==='all'?'active':''}" onclick="vaultGroup='all';renderVault()">All (${questions.length})</button>
+      <button class="cat-tab ${vaultGroup==='life'?'active':''}" onclick="vaultGroup='life';renderVault()">&#127793; Life (${questions.filter(q=>q.group==='life').length})</button>
+      <button class="cat-tab ${vaultGroup==='work'?'work-active':''}" onclick="vaultGroup='work';renderVault()">&#128188; Work (${questions.filter(q=>q.group==='work').length})</button>
+    </div>
+    ${['life','work'].map(g=>{
+      const gqs=filtered.filter(q=>q.group===g);
+      if(!gqs.length) return '';
+      return `<div class="group-section ${g}"><span class="group-icon">${g==='life'?'&#127793;':'&#128188;'}</span><span class="group-title">${g==='life'?'Life':'Work'}</span></div>
+      <div class="card" style="margin-top:4px">${gqs.map(q=>`
+        <div class="q-item">
+          <div class="q-drag">&#9776;</div>
+          <div class="q-info" onclick="editQuestion('${q.id}')">
+            <div class="q-name">${getCatIcon(q.category)} ${q.labelEn} · ${q.label}</div>
+            <div class="q-type">${getTypeLabel(q.type)}${q.type==='choice'?' · '+q.options.length+' options':''} · ${q.category}</div>
+          </div>
+          <button class="q-toggle ${q.active?'on':'off'}" onclick="toggleQuestion('${q.id}')"></button>
+        </div>`).join('')}</div>`;
+    }).join('')}`;
+}
+function toggleQuestion(id) { const qs=getQuestions(); const q=qs.find(x=>x.id===id); if(q){q.active=!q.active;saveQuestions(qs);renderVault();} }
+function editQuestion(id) {
+  const qs=getQuestions(); const q=id?qs.find(x=>x.id===id):null; const isNew=!q;
+  const d=q||{id:uuid(),label:'',labelEn:'',category:'health',group:'life',type:'text',options:[],order:qs.length+1,active:true};
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
+    <h3>${isNew?'Add Question':'Edit Question'}</h3>
+    <div class="form-group"><label>Group</label><select id="eq-group"><option value="life" ${d.group==='life'?'selected':''}>&#127793; Life</option><option value="work" ${d.group==='work'?'selected':''}>&#128188; Work</option></select></div>
+    <div class="form-group"><label>Chinese Label</label><input class="text-input" id="eq-label" value="${d.label}" placeholder="e.g. 心情"></div>
+    <div class="form-group"><label>English Label</label><input class="text-input" id="eq-labelEn" value="${d.labelEn}" placeholder="e.g. Mood"></div>
+    <div class="form-group"><label>Category</label><select id="eq-category"><option value="health" ${d.category==='health'?'selected':''}>Health</option><option value="mood" ${d.category==='mood'?'selected':''}>Mood</option><option value="productivity" ${d.category==='productivity'?'selected':''}>Productivity</option><option value="reflection" ${d.category==='reflection'?'selected':''}>Reflection</option></select></div>
+    <div class="form-group"><label>Input Type</label><select id="eq-type" onchange="toggleOptsField()"><option value="text" ${d.type==='text'?'selected':''}>Text</option><option value="choice" ${d.type==='choice'?'selected':''}>Choice</option><option value="number" ${d.type==='number'?'selected':''}>Number</option><option value="time" ${d.type==='time'?'selected':''}>Time</option><option value="rating" ${d.type==='rating'?'selected':''}>Rating (1-5)</option></select></div>
+    <div class="form-group" id="options-group" style="display:${d.type==='choice'?'block':'none'}"><label>Options</label>
+      <div class="options-list" id="options-list">${(d.options||[]).map(o=>`<div class="option-row"><input class="text-input opt-input" value="${o}" placeholder="Option"><button class="remove-opt" onclick="this.parentElement.remove()">&#10005;</button></div>`).join('')}</div>
+      <button class="add-option-btn" onclick="addOptRow()">+ Add option</button>
+    </div>
+    <div class="edit-actions">
+      ${!isNew?`<button class="btn-secondary" style="flex:0.5;background:var(--danger-light);color:var(--danger);border-color:var(--danger-light)" onclick="deleteQuestion('${d.id}')">Delete</button>`:''}
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveQuestion('${d.id}',${isNew})">Save</button>
+    </div></div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+function toggleOptsField() { document.getElementById('options-group').style.display=document.getElementById('eq-type').value==='choice'?'block':'none'; }
+function addOptRow() { const l=document.getElementById('options-list');const d=document.createElement('div');d.className='option-row';d.innerHTML=`<input class="text-input opt-input" placeholder="Option"><button class="remove-opt" onclick="this.parentElement.remove()">&#10005;</button>`;l.appendChild(d); }
+function saveQuestion(id,isNew) {
+  const qs=getQuestions();
+  const label=document.getElementById('eq-label').value.trim(), labelEn=document.getElementById('eq-labelEn').value.trim();
+  if(!label&&!labelEn){showToast('Please enter a label');return;}
+  const group=document.getElementById('eq-group').value, category=document.getElementById('eq-category').value;
+  const type=document.getElementById('eq-type').value;
+  const options=Array.from(document.querySelectorAll('.opt-input')).map(i=>i.value.trim()).filter(Boolean);
+  if(isNew) qs.push({id,label:label||labelEn,labelEn:labelEn||label,category,group,type,options,order:qs.length+1,active:true});
+  else { const q=qs.find(x=>x.id===id); if(q)Object.assign(q,{label:label||labelEn,labelEn:labelEn||label,category,group,type,options}); }
+  saveQuestions(qs); closeEditModal(); renderVault(); showToast(isNew?'Question added!':'Question updated!');
+}
+function deleteQuestion(id) { if(!confirm('Delete this question?'))return; saveQuestions(getQuestions().filter(x=>x.id!==id)); closeEditModal(); renderVault(); showToast('Deleted'); }
+
+// ================================================================
+// MONTHLY
+// ================================================================
+function renderMonthly() {
+  const records=getRecords(), questions=getQuestions().filter(q=>q.active).sort((a,b)=>a.order-b.order);
+  const monthDates=Object.keys(records).filter(d=>getMonthKey(d)===currentMonth).sort().reverse();
+  const showCols=questions.slice(0,5);
+  document.getElementById('view-monthly').innerHTML=`
+    <div class="month-nav"><button class="month-arrow" onclick="changeMonth(-1)">&#8249;</button><h2>${monthLabel(currentMonth)}</h2><button class="month-arrow" onclick="changeMonth(1)">&#8250;</button></div>
+    ${monthDates.length?`<div class="month-table-wrap"><table class="month-table"><thead><tr><th>Date</th>${showCols.map(q=>`<th>${q.label}</th>`).join('')}</tr></thead><tbody>
+    ${monthDates.map(d=>{const rec=records[d];return`<tr onclick="openCreateEdit('${d}')"><td><strong>${fmtShort(d)}</strong></td>${showCols.map(q=>{let v=rec.responses?.[q.id]||'';if(q.type==='rating'&&v)v='&#11088;'.repeat(parseInt(v));if(q.label==='心情'&&v)v=`<span class="mood-dot ${getMoodClass(v)}"></span>${getMoodLabel(v)}`;return`<td>${v||'-'}</td>`;}).join('')}</tr>`;}).join('')}
+    </tbody></table></div>`:`<div class="empty-state"><div class="empty-icon">&#128197;</div><p>No records for ${monthLabel(currentMonth)}</p></div>`}
+    <div style="text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center">
+      <button class="add-btn" style="padding:10px 20px" onclick="exportMonthCSV()">Export CSV &#8595;</button>
+      <button class="add-btn" style="padding:10px 20px;background:var(--accent)" onclick="updateToNotes()">&#128221; Update to Notes</button>
+    </div>`;
+}
+function changeMonth(dir) { const[y,m]=currentMonth.split('-').map(Number);const d=new Date(y,m-1+dir,1);currentMonth=d.toISOString().slice(0,7);renderMonthly(); }
+function exportMonthCSV() {
+  const records=getRecords(),questions=getQuestions().sort((a,b)=>a.order-b.order);
+  const mds=Object.keys(records).filter(d=>getMonthKey(d)===currentMonth).sort();
+  if(!mds.length){showToast('No data');return;}
+  const hdr=['Date',...questions.map(q=>q.labelEn+' / '+q.label)];
+  const rows=mds.map(d=>{const rec=records[d];return[d,...questions.map(q=>rec.responses?.[q.id]||'')];});
+  const csv=[hdr,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`sop-${currentMonth}.csv`;a.click();URL.revokeObjectURL(url);showToast('Exported!');
+}
+
+// ================================================================
+// ROUTINES
+// ================================================================
+function renderRoutines() {
+  const routines=getRoutines(),today=todayStr();
+  const items=routines.filter(r=>r.type===currentRoutineTab&&r.active);
+  const dc=items.filter(r=>isRoutineDone(r.id,today)).length;
+  const pct=items.length?Math.round(dc/items.length*100):0;
+  document.getElementById('view-routines').innerHTML=`
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">My Routines</h2>
+    <div class="routine-tabs">
+      <button class="routine-tab ${currentRoutineTab==='morning'?'active':''}" onclick="currentRoutineTab='morning';renderRoutines()">&#9728;&#65039; Morning</button>
+      <button class="routine-tab ${currentRoutineTab==='evening'?'active':''}" onclick="currentRoutineTab='evening';renderRoutines()">&#127769; Evening</button>
+    </div>
+    <div class="routine-summary"><div class="big-pct">${pct}%</div><div>${dc} of ${items.length} completed today</div></div>
+    ${items.map(r=>{const done=isRoutineDone(r.id,today);return`<div class="routine-item">
+      <div class="routine-check ${done?'done':''}" onclick="toggleRoutineRecord('${r.id}','${today}');renderRoutines()">${done?'&#10003;':''}</div>
+      <div class="r-label ${done?'done-text':''}" onclick="editRoutineItem('${r.id}')">${r.label}</div>
+      ${r.reminderTime?`<div class="r-reminder">&#128276; ${r.reminderTime}</div>`:`<div class="r-time" onclick="editRoutineItem('${r.id}')" style="cursor:pointer">&#9998;</div>`}
+    </div>`;}).join('')}
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button class="add-btn" style="flex:1;justify-content:center;padding:12px" onclick="addRoutineItem()">+ Add Item</button>
+      <button class="add-btn" style="flex:1;justify-content:center;padding:12px;background:var(--accent)" onclick="manageRoutineItems()">Manage</button>
+    </div>`;
+}
+function addRoutineItem() {
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
+    <h3>Add Routine Item</h3>
+    <div class="form-group"><label>Label</label><input class="text-input" id="ri-label" placeholder="e.g. Drink water / 喝水"></div>
+    <div class="form-group"><label>Type</label><select id="ri-type"><option value="morning" ${currentRoutineTab==='morning'?'selected':''}>Morning</option><option value="evening" ${currentRoutineTab==='evening'?'selected':''}>Evening</option></select></div>
+    <div class="form-group"><label>Reminder Time (optional)</label><input type="time" class="text-input" id="ri-reminder" value=""></div>
+    <div class="edit-actions"><button class="btn-secondary" onclick="closeEditModal()">Cancel</button><button class="btn-primary" onclick="saveNewRoutine()">Save</button></div></div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+function saveNewRoutine() {
+  const label=document.getElementById('ri-label').value.trim();if(!label){showToast('Enter a label');return;}
+  const routines=getRoutines();
+  routines.push({id:uuid(),label,type:document.getElementById('ri-type').value,order:routines.length+1,active:true,reminderTime:document.getElementById('ri-reminder').value||''});
+  saveRoutines(routines);closeEditModal();renderRoutines();showToast('Added!');
+}
+function editRoutineItem(id) {
+  const r=getRoutines().find(x=>x.id===id);if(!r)return;
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
+    <h3>Edit Routine Item</h3>
+    <div class="form-group"><label>Label</label><input class="text-input" id="ri-label" value="${r.label}"></div>
+    <div class="form-group"><label>Type</label><select id="ri-type"><option value="morning" ${r.type==='morning'?'selected':''}>Morning</option><option value="evening" ${r.type==='evening'?'selected':''}>Evening</option></select></div>
+    <div class="form-group"><label>Reminder Time (leave empty = no reminder)</label><input type="time" class="text-input" id="ri-reminder" value="${r.reminderTime||''}"></div>
+    <div class="edit-actions">
+      <button class="btn-secondary" style="flex:0.5;background:var(--danger-light);color:var(--danger);border-color:var(--danger-light)" onclick="deleteRoutineItem('${r.id}')">Delete</button>
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="updateRoutineItem('${r.id}')">Save</button>
+    </div></div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+function updateRoutineItem(id) {
+  const routines=getRoutines(),r=routines.find(x=>x.id===id);if(!r)return;
+  r.label=document.getElementById('ri-label').value.trim()||r.label;
+  r.type=document.getElementById('ri-type').value;
+  r.reminderTime=document.getElementById('ri-reminder').value||'';
+  saveRoutines(routines);closeEditModal();renderRoutines();showToast('Updated!');
+}
+function deleteRoutineItem(id) { if(!confirm('Delete?'))return;saveRoutines(getRoutines().filter(x=>x.id!==id));closeEditModal();renderRoutines();showToast('Deleted'); }
+function manageRoutineItems() {
+  const items=getRoutines().filter(r=>r.type===currentRoutineTab);
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
+    <h3>Manage ${currentRoutineTab==='morning'?'Morning':'Evening'} Routine</h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Tap to edit. Toggle to enable/disable.</p>
+    ${items.map(r=>`<div class="q-item"><div class="q-info" onclick="closeEditModal();editRoutineItem('${r.id}')"><div class="q-name">${r.label}</div><div class="q-type">${r.reminderTime?'&#128276; '+r.reminderTime:'No reminder'}</div></div><button class="q-toggle ${r.active?'on':'off'}" onclick="const rs=getRoutines();const x=rs.find(y=>y.id==='${r.id}');if(x){x.active=!x.active;saveRoutines(rs);manageRoutineItems();}"></button></div>`).join('')}
+    <div class="edit-actions" style="margin-top:20px"><button class="btn-primary" style="width:100%" onclick="closeEditModal();renderRoutines()">Done</button></div></div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+// ================================================================
+// UPDATE TO NOTES (Share API + clipboard fallback)
+// ================================================================
+function formatRecordsForNotes(monthKey) {
+  const records=getRecords(), questions=getQuestions().sort((a,b)=>a.order-b.order);
+  const lifeQs=questions.filter(q=>q.group==='life'), workQs=questions.filter(q=>q.group==='work');
+  const dates=Object.keys(records).filter(d=>getMonthKey(d)===monthKey).sort();
+  if(!dates.length) return null;
+  let text=`My SOP - ${monthLabel(monthKey)}\n${'='.repeat(35)}\n\n`;
+  dates.forEach(d=>{
+    const rec=records[d];
+    text+=`${fmtFull(d)}\n${'-'.repeat(30)}\n`;
+    function addGroup(label, qs) {
+      const filled=qs.filter(q=>rec.responses?.[q.id]);
+      if(!filled.length) return;
+      text+=`\n  [${label}]\n`;
+      filled.forEach(q=>{
+        let v=rec.responses[q.id];
+        if(q.type==='rating') v='*'.repeat(parseInt(v))+` (${v}/5)`;
+        text+=`  ${q.labelEn}: ${v}\n`;
+      });
+    }
+    addGroup('Life', lifeQs);
+    addGroup('Work', workQs);
+    text+='\n\n';
+  });
+  text+=`--- Updated: ${new Date().toLocaleString()} ---`;
+  return text;
+}
+
+async function updateToNotes() {
+  const text=formatRecordsForNotes(currentMonth);
+  if(!text){ showToast('No records for '+monthLabel(currentMonth)); return; }
+  const title=`My SOP - ${monthLabel(currentMonth)}`;
+  // Try Web Share API first (works on Safari/iOS -> can share to Notes)
+  if(navigator.share) {
+    try {
+      await navigator.share({ title, text });
+      showToast('Shared!');
+      return;
+    } catch(e) {
+      if(e.name==='AbortError') return; // user cancelled
+    }
+  }
+  // Fallback: copy to clipboard
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard! Paste into Apple Notes.');
+  } catch {
+    // Final fallback: select from textarea
+    const sheet=document.getElementById('edit-sheet');
+    sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
+      <h3>Copy to Notes</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Select all and copy, then paste into Apple Notes:</p>
+      <textarea class="text-input" rows="12" style="font-size:12px;font-family:monospace" onclick="this.select()">${text}</textarea>
+      <div class="edit-actions" style="margin-top:16px"><button class="btn-primary" style="width:100%" onclick="closeEditModal()">Done</button></div></div>`;
+    document.getElementById('edit-modal').classList.add('active');
+  }
+}
+
+// ================================================================
+// iCLOUD SYNC
+// ================================================================
+const SYNC_FILENAME='my-sop-sync.json';
+
+function saveToICloud() {
+  const data={
+    questions: getQuestions(),
+    records: getRecords(),
+    routines: getRoutines(),
+    routineRecords: getRoutineRecords(),
+    syncedAt: new Date().toISOString(),
+    syncVersion: 2
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=SYNC_FILENAME;
+  a.click();
+  URL.revokeObjectURL(url);
+  // Save last sync time
+  localStorage.setItem('sop_last_sync', new Date().toISOString());
+  showToast('Saved! Move the file to iCloud Drive.');
+}
+
+function loadFromICloud(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e) {
+    try {
+      const data=JSON.parse(e.target.result);
+      if(!data.syncVersion) { showToast('Not a valid sync file'); return; }
+      // Smart merge: combine records from both sources
+      const localRecords=getRecords();
+      const incomingRecords=data.records||{};
+      const mergedRecords={...localRecords};
+      // For each incoming record, keep the newer one
+      Object.keys(incomingRecords).forEach(date=>{
+        const local=localRecords[date];
+        const incoming=incomingRecords[date];
+        if(!local) { mergedRecords[date]=incoming; }
+        else if(incoming.updatedAt && (!local.updatedAt || incoming.updatedAt > local.updatedAt)) {
+          mergedRecords[date]=incoming;
+        }
+        // else keep local (it's newer)
+      });
+      // Merge routine records similarly
+      const localRR=getRoutineRecords();
+      const incomingRR=data.routineRecords||{};
+      const mergedRR={...localRR,...incomingRR};
+      // Questions and routines: use incoming (they're the "config")
+      if(data.questions) save(SK.questions, data.questions);
+      save(SK.records, mergedRecords);
+      if(data.routines) save(SK.routines, data.routines);
+      save(SK.routineRecords, mergedRR);
+      localStorage.setItem('sop_last_sync', new Date().toISOString());
+      const incomingCount=Object.keys(incomingRecords).length;
+      const mergedCount=Object.keys(mergedRecords).length;
+      showToast(`Synced! ${mergedCount} total records.`);
+      switchView('home');
+    } catch(err) { showToast('Invalid sync file'); }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function showSyncPanel() {
+  const lastSync=localStorage.getItem('sop_last_sync');
+  const lastSyncText=lastSync ? new Date(lastSync).toLocaleString() : 'Never';
+  const recordCount=Object.keys(getRecords()).length;
+  const sheet=document.getElementById('edit-sheet');
+  sheet.innerHTML=`<div class="modal-handle"></div>
+    <div class="edit-modal-content">
+      <h3>&#9729; iCloud Sync</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+        Keep your data in sync across Mac and iPhone using iCloud Drive. Save your data as a file, store it in iCloud Drive, then load it on your other device.
+      </p>
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text-light);margin-bottom:4px">STATUS</div>
+        <div style="font-size:14px">&#128197; ${recordCount} records stored locally</div>
+        <div style="font-size:14px;margin-top:4px">&#128336; Last sync: ${lastSyncText}</div>
+      </div>
+      <div class="sync-bar" style="margin:0;padding:0;box-shadow:none;flex-direction:column;gap:10px">
+        <button class="sync-btn save-sync" onclick="closeEditModal();saveToICloud()">
+          &#9729; Save to iCloud Drive
+        </button>
+        <button class="sync-btn load-sync" onclick="closeEditModal();document.getElementById('sync-load-file').click()">
+          &#128229; Load from iCloud Drive
+        </button>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:var(--accent-light);border-radius:var(--radius-sm)">
+        <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px">How it works</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">
+          1. Tap <strong>Save</strong> to download <code>${SYNC_FILENAME}</code><br>
+          2. Move/save it to an <strong>iCloud Drive</strong> folder<br>
+          3. On your other device, open this app and tap <strong>Load</strong><br>
+          4. Pick the file from iCloud Drive<br><br>
+          Records are <strong>smart-merged</strong> — if both devices have edits for the same day, the newer version wins. Nothing gets lost.
+        </div>
+      </div>
+      <div class="edit-actions" style="margin-top:16px">
+        <button class="btn-secondary" onclick="document.getElementById('import-file').click();closeEditModal()">Import Backup</button>
+        <button class="btn-primary" onclick="closeEditModal()">Done</button>
+      </div>
+    </div>`;
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+// ================================================================
+// EXPORT (full backup)
+// ================================================================
+function exportData() {
+  const data={questions:getQuestions(),records:getRecords(),routines:getRoutines(),routineRecords:getRoutineRecords(),exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`sop-backup-${todayStr()}.json`;a.click();URL.revokeObjectURL(url);showToast('Backup saved!');
+}
+
+// INIT
+renderHome();
+</script>
+</body>
+</html>
