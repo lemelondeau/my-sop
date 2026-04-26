@@ -1068,8 +1068,8 @@ const SYNC_FILENAME='my-sop-sync.json';
 
 async function saveToICloud() {
   const data={
-    questions: getQuestions(),
-    records: getRecords(),
+    questions: DEFAULT_QUESTIONS,
+    records: remapRecordIds(getRecords(), getQuestions()),
     routines: getRoutines(),
     routineRecords: getRoutineRecords(),
     syncedAt: new Date().toISOString(),
@@ -1102,6 +1102,37 @@ async function saveToICloud() {
   showToast('Saved! Move the file to your iCloud Drive folder.');
 }
 
+function remapRecordIds(records, questions) {
+  // Build label->stableId from current DEFAULT_QUESTIONS
+  const labelToStable = {};
+  DEFAULT_QUESTIONS.forEach(q => labelToStable[q.label] = q.id);
+  // Build oldId->stableId from the file's question list
+  const idMap = {};
+  (questions||[]).forEach(q => {
+    const stable = labelToStable[q.label];
+    if(stable && q.id !== stable) idMap[q.id] = stable;
+  });
+  // Also map from any locally stored questions
+  (load(SK.questions)||[]).forEach(q => {
+    const stable = labelToStable[q.label];
+    if(stable && q.id !== stable) idMap[q.id] = stable;
+  });
+  if(!Object.keys(idMap).length) return records;
+  const remapped = {};
+  Object.keys(records).forEach(date => {
+    const rec = {...records[date]};
+    if(rec.responses) {
+      const newResp = {};
+      Object.keys(rec.responses).forEach(oldId => {
+        const newId = idMap[oldId] || oldId;
+        if(rec.responses[oldId] || !(newId in newResp)) newResp[newId] = rec.responses[oldId];
+      });
+      rec.responses = newResp;
+    }
+    remapped[date] = rec;
+  });
+  return remapped;
+}
 function loadFromICloud(event) {
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -1109,35 +1140,39 @@ function loadFromICloud(event) {
     try {
       const data=JSON.parse(e.target.result);
       if(!data.syncVersion) { showToast('Not a valid sync file'); return; }
-      // Smart merge: combine records from both sources
-      const localRecords=getRecords();
-      const incomingRecords=data.records||{};
+      // Remap old IDs to stable IDs in both local and incoming records
+      const localRecords=remapRecordIds(getRecords(), load(SK.questions));
+      const incomingRecords=remapRecordIds(data.records||{}, data.questions);
       const mergedRecords={...localRecords};
-      // For each incoming record, keep the newer one
+      // For each incoming record, keep the one with more filled answers (not just newer timestamp)
       Object.keys(incomingRecords).forEach(date=>{
         const local=localRecords[date];
         const incoming=incomingRecords[date];
         if(!local) { mergedRecords[date]=incoming; }
-        else if(incoming.updatedAt && (!local.updatedAt || incoming.updatedAt > local.updatedAt)) {
-          mergedRecords[date]=incoming;
+        else {
+          // Count non-empty responses in each
+          const localFilled=Object.values(local.responses||{}).filter(v=>v).length;
+          const incomingFilled=Object.values(incoming.responses||{}).filter(v=>v).length;
+          if(incomingFilled > localFilled) { mergedRecords[date]=incoming; }
+          else if(incomingFilled === localFilled && incoming.updatedAt > (local.updatedAt||0)) { mergedRecords[date]=incoming; }
+          // else keep local
         }
-        // else keep local (it's newer)
       });
-      // Merge routine records similarly
+      // Merge routine records
       const localRR=getRoutineRecords();
       const incomingRR=data.routineRecords||{};
       const mergedRR={...localRR,...incomingRR};
-      // Questions and routines: use incoming (they're the "config")
-      if(data.questions) save(SK.questions, data.questions);
+      // Use stable questions and routines
+      save(SK.questions, DEFAULT_QUESTIONS);
+      localStorage.setItem('sop_questions_version', QUESTIONS_VERSION);
       save(SK.records, mergedRecords);
-      if(data.routines) save(SK.routines, data.routines);
+      save(SK.routines, DEFAULT_ROUTINES);
       save(SK.routineRecords, mergedRR);
       localStorage.setItem('sop_last_sync', new Date().toISOString());
-      const incomingCount=Object.keys(incomingRecords).length;
       const mergedCount=Object.keys(mergedRecords).length;
       showToast(`Synced! ${mergedCount} total records.`);
       switchView('home');
-    } catch(err) { showToast('Invalid sync file'); }
+    } catch(err) { showToast('Invalid sync file: '+err.message); }
   };
   reader.readAsText(file);
   event.target.value='';
