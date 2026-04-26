@@ -412,39 +412,73 @@ body {
 // ================================================================
 const SK = { questions:'sop_questions', records:'sop_records', routines:'sop_routines', routineRecords:'sop_routine_records' };
 function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,9); }
+function stableId(label) {
+  // Generate a deterministic ID from label, so same question = same ID on any device
+  let h = 0;
+  for(let i=0; i<label.length; i++) { h = ((h << 5) - h + label.charCodeAt(i)) | 0; }
+  return 'q_' + Math.abs(h).toString(36);
+}
 function load(k) { try { return JSON.parse(localStorage.getItem(k))||null; } catch { return null; } }
 function save(k,d) { localStorage.setItem(k,JSON.stringify(d)); }
 
-const QUESTIONS_VERSION = 2;
+const QUESTIONS_VERSION = 3;
 const DEFAULT_QUESTIONS = [
-  { id:uuid(), label:'身体状况', labelEn:'Health', category:'health', group:'life', type:'text', options:[], order:1, active:true },
-  { id:uuid(), label:'运动', labelEn:'Exercise', category:'health', group:'life', type:'text', options:[], order:2, active:true },
-  { id:uuid(), label:'躺下时间', labelEn:'Bedtime', category:'health', group:'life', type:'time', options:[], order:3, active:true },
-  { id:uuid(), label:'暴饮暴食', labelEn:'Overeating', category:'health', group:'life', type:'choice', options:['没有 / No','一点点 / A little','有 / Yes','严重 / A lot'], order:4, active:true },
-  { id:uuid(), label:'心情', labelEn:'Mood', category:'mood', group:'life', type:'choice', options:['Great / 很好','OK / 还行','Low / 不太好','Bad / 很差'], order:5, active:true },
-  { id:uuid(), label:'今天发生的好事', labelEn:'Good things today', category:'mood', group:'life', type:'text', options:[], order:6, active:true },
-  { id:uuid(), label:'今天的不愉快', labelEn:'Unpleasant things today', category:'mood', group:'life', type:'text', options:[], order:7, active:true },
-  { id:uuid(), label:'今日感悟', labelEn:'Today\'s reflection', category:'reflection', group:'life', type:'text', options:[], order:8, active:true },
-  { id:uuid(), label:'今日进步', labelEn:'Today\'s progress', category:'reflection', group:'life', type:'text', options:[], order:9, active:true },
-  { id:uuid(), label:'我太棒啦', labelEn:'I\'m awesome!', category:'reflection', group:'life', type:'text', options:[], order:10, active:true },
-  { id:uuid(), label:'我有一个主意', labelEn:'I have an idea!', category:'reflection', group:'life', type:'text', options:[], order:11, active:true },
+  { id:'q_health', label:'身体状况', labelEn:'Health', category:'health', group:'life', type:'text', options:[], order:1, active:true },
+  { id:'q_exercise', label:'运动', labelEn:'Exercise', category:'health', group:'life', type:'text', options:[], order:2, active:true },
+  { id:'q_bedtime', label:'躺下时间', labelEn:'Bedtime', category:'health', group:'life', type:'time', options:[], order:3, active:true },
+  { id:'q_overeating', label:'暴饮暴食', labelEn:'Overeating', category:'health', group:'life', type:'choice', options:['没有 / No','一点点 / A little','有 / Yes','严重 / A lot'], order:4, active:true },
+  { id:'q_mood', label:'心情', labelEn:'Mood', category:'mood', group:'life', type:'choice', options:['Great / 很好','OK / 还行','Low / 不太好','Bad / 很差'], order:5, active:true },
+  { id:'q_good_things', label:'今天发生的好事', labelEn:'Good things today', category:'mood', group:'life', type:'text', options:[], order:6, active:true },
+  { id:'q_unpleasant', label:'今天的不愉快', labelEn:'Unpleasant things today', category:'mood', group:'life', type:'text', options:[], order:7, active:true },
+  { id:'q_reflection', label:'今日感悟', labelEn:'Today\'s reflection', category:'reflection', group:'life', type:'text', options:[], order:8, active:true },
+  { id:'q_progress', label:'今日进步', labelEn:'Today\'s progress', category:'reflection', group:'life', type:'text', options:[], order:9, active:true },
+  { id:'q_awesome', label:'我太棒啦', labelEn:'I\'m awesome!', category:'reflection', group:'life', type:'text', options:[], order:10, active:true },
+  { id:'q_idea', label:'我有一个主意', labelEn:'I have an idea!', category:'reflection', group:'life', type:'text', options:[], order:11, active:true },
 ];
 
 const DEFAULT_ROUTINES = [
-  { id:uuid(), label:'Drink water / 喝水', type:'morning', order:1, active:true, reminderTime:'' },
-  { id:uuid(), label:'Stretch 10 min / 拉伸', type:'morning', order:2, active:true, reminderTime:'' },
-  { id:uuid(), label:'Review today\'s plan / 看今天计划', type:'morning', order:3, active:true, reminderTime:'' },
-  { id:uuid(), label:'Healthy breakfast / 健康早餐', type:'morning', order:4, active:true, reminderTime:'' },
-  { id:uuid(), label:'Meditate 5 min / 冥想', type:'morning', order:5, active:true, reminderTime:'' },
-  { id:uuid(), label:'Record my day / 记录今天', type:'evening', order:1, active:true, reminderTime:'' },
-  { id:uuid(), label:'Skincare / 护肤', type:'evening', order:2, active:true, reminderTime:'' },
-  { id:uuid(), label:'Read 15 min / 阅读', type:'evening', order:3, active:true, reminderTime:'' },
-  { id:uuid(), label:'Plan tomorrow / 计划明天', type:'evening', order:4, active:true, reminderTime:'' },
+  { id:'r_water', label:'Drink water / 喝水', type:'morning', order:1, active:true, reminderTime:'' },
+  { id:'r_stretch', label:'Stretch 10 min / 拉伸', type:'morning', order:2, active:true, reminderTime:'' },
+  { id:'r_plan_review', label:'Review today\'s plan / 看今天计划', type:'morning', order:3, active:true, reminderTime:'' },
+  { id:'r_breakfast', label:'Healthy breakfast / 健康早餐', type:'morning', order:4, active:true, reminderTime:'' },
+  { id:'r_meditate', label:'Meditate 5 min / 冥想', type:'morning', order:5, active:true, reminderTime:'' },
+  { id:'r_record', label:'Record my day / 记录今天', type:'evening', order:1, active:true, reminderTime:'' },
+  { id:'r_skincare', label:'Skincare / 护肤', type:'evening', order:2, active:true, reminderTime:'' },
+  { id:'r_read', label:'Read 15 min / 阅读', type:'evening', order:3, active:true, reminderTime:'' },
+  { id:'r_plan_tomorrow', label:'Plan tomorrow / 计划明天', type:'evening', order:4, active:true, reminderTime:'' },
 ];
 
+function migrateRecordIds(oldQuestions) {
+  // Build a map: old random UUID -> new stable ID, matched by label
+  const labelToStableId = {};
+  DEFAULT_QUESTIONS.forEach(q => labelToStableId[q.label] = q.id);
+  const idMap = {};
+  oldQuestions.forEach(oq => {
+    const stableId = labelToStableId[oq.label];
+    if(stableId && oq.id !== stableId) idMap[oq.id] = stableId;
+  });
+  if(!Object.keys(idMap).length) return;
+  // Remap all record responses
+  const records = getRecords();
+  let changed = false;
+  Object.keys(records).forEach(date => {
+    const rec = records[date];
+    if(!rec.responses) return;
+    const newResp = {};
+    Object.keys(rec.responses).forEach(oldId => {
+      const newId = idMap[oldId] || oldId;
+      newResp[newId] = rec.responses[oldId];
+      if(newId !== oldId) changed = true;
+    });
+    rec.responses = newResp;
+  });
+  if(changed) saveRecords(records);
+}
 function getQuestions() {
   const storedVersion = localStorage.getItem('sop_questions_version');
   if(!storedVersion || parseInt(storedVersion) < QUESTIONS_VERSION) {
+    const oldQ = load(SK.questions);
+    if(oldQ) migrateRecordIds(oldQ);
     save(SK.questions, DEFAULT_QUESTIONS);
     localStorage.setItem('sop_questions_version', QUESTIONS_VERSION);
     return DEFAULT_QUESTIONS;
@@ -828,7 +862,7 @@ function renderVault() {
 function toggleQuestion(id) { const qs=getQuestions(); const q=qs.find(x=>x.id===id); if(q){q.active=!q.active;saveQuestions(qs);renderVault();} }
 function editQuestion(id) {
   const qs=getQuestions(); const q=id?qs.find(x=>x.id===id):null; const isNew=!q;
-  const d=q||{id:uuid(),label:'',labelEn:'',category:'health',group:'life',type:'text',options:[],order:qs.length+1,active:true};
+  const d=q||{id:'__new__',label:'',labelEn:'',category:'health',group:'life',type:'text',options:[],order:qs.length+1,active:true};
   const sheet=document.getElementById('edit-sheet');
   sheet.innerHTML=`<div class="modal-handle"></div><div class="edit-modal-content">
     <h3>${isNew?'Add Question':'Edit Question'}</h3>
@@ -857,7 +891,7 @@ function saveQuestion(id,isNew) {
   const group=document.getElementById('eq-group').value, category=document.getElementById('eq-category').value;
   const type=document.getElementById('eq-type').value;
   const options=Array.from(document.querySelectorAll('.opt-input')).map(i=>i.value.trim()).filter(Boolean);
-  if(isNew) qs.push({id,label:label||labelEn,labelEn:labelEn||label,category,group,type,options,order:qs.length+1,active:true});
+  if(isNew) { const newId=stableId(label||labelEn); qs.push({id:newId,label:label||labelEn,labelEn:labelEn||label,category,group,type,options,order:qs.length+1,active:true}); }
   else { const q=qs.find(x=>x.id===id); if(q)Object.assign(q,{label:label||labelEn,labelEn:labelEn||label,category,group,type,options}); }
   saveQuestions(qs); closeEditModal(); renderVault(); showToast(isNew?'Question added!':'Question updated!');
 }
@@ -1032,7 +1066,7 @@ async function updateToNotes() {
 // ================================================================
 const SYNC_FILENAME='my-sop-sync.json';
 
-function saveToICloud() {
+async function saveToICloud() {
   const data={
     questions: getQuestions(),
     records: getRecords(),
@@ -1041,16 +1075,31 @@ function saveToICloud() {
     syncedAt: new Date().toISOString(),
     syncVersion: 2
   };
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const jsonStr=JSON.stringify(data,null,2);
+  const blob=new Blob([jsonStr],{type:'application/json'});
+  const file=new File([blob], SYNC_FILENAME, {type:'application/json'});
+
+  // On iOS/Safari: use Share API so user can "Save to Files" → pick iCloud Drive
+  if(navigator.canShare && navigator.canShare({files:[file]})) {
+    try {
+      await navigator.share({files:[file], title:'My SOP Sync'});
+      localStorage.setItem('sop_last_sync', new Date().toISOString());
+      showToast('Saved to iCloud Drive!');
+      return;
+    } catch(e) {
+      if(e.name==='AbortError') return; // user cancelled
+    }
+  }
+
+  // Fallback: regular download (desktop browsers)
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
   a.download=SYNC_FILENAME;
   a.click();
   URL.revokeObjectURL(url);
-  // Save last sync time
   localStorage.setItem('sop_last_sync', new Date().toISOString());
-  showToast('Saved! Move the file to iCloud Drive.');
+  showToast('Saved! Move the file to your iCloud Drive folder.');
 }
 
 function loadFromICloud(event) {
